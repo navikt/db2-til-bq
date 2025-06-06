@@ -1,10 +1,12 @@
-FROM busybox:latest
-ENV PORT=8080
+FROM python:3.12-slim
 
-ADD ./www/index.html /www/index.html
-ADD ./www/hello-nais.png /www/hello-nais.png
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    build-essential \
+    git
 
-HEALTHCHECK CMD nc -z localhost $PORT
+COPY requirements.txt ./
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Create a basic webserver and run it until the container is stopped
-CMD echo "httpd started" && trap "exit 0;" TERM INT; httpd -v -p $PORT -h /www -f & wait
+USER apprunner
+CMD [ "python", "./main.py" ]

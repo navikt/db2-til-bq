@@ -1,0 +1,14 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  labels:
+    team: utsikt
+  name: venteregister-data
+  namespace: utsikt
+spec:
+  schedule: "0 * * * *" # Runs every hour
+  image: {{image}} 
+  resources:
+    requests:
+      cpu: 200m
+      memory: 128Mi
