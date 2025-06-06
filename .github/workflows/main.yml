@@ -29,7 +29,7 @@ jobs:
       - name: Deploy to Nais
         uses: nais/deploy/actions/deploy@v2
         env:
-          CLUSTER: "prod-fss"
+          CLUSTER: "dev-fss"
           RESOURCE: .nais/job.yaml # same list as in changed-files step above
           WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
