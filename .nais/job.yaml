@@ -7,7 +7,7 @@ metadata:
   namespace: utsikt
 spec:
   schedule: "0 * * * *" # Runs every hour
-  image: {{image}} 
+  image: "{{ image }}"
   resources:
     requests:
       cpu: 200m
