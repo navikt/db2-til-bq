@@ -13,15 +13,7 @@ jobs:
       actions: read
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Fetch all history for what-changed action
-      - name: Determine what to do
-        id: changed-files
-        uses: "nais/what-changed@main"
-        with:
-          files: .nais/job.yaml #, topic.yaml, statefulset.yaml, etc.
-      - name: Build and push image and SBOM to OCI registry
-        if: steps.changed-files.outputs.changed != 'only-inputs'
+      - name: Build and push image
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
@@ -30,6 +22,6 @@ jobs:
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "dev-fss"
-          RESOURCE: .nais/job.yaml # same list as in changed-files step above
+          RESOURCE: .nais/job.yaml
           WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
