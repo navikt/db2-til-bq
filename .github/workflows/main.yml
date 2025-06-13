@@ -23,5 +23,5 @@ jobs:
         env:
           CLUSTER: "dev-fss"
           RESOURCE: .nais/job.yaml
-          WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
+          VAR: image=${{ steps.docker-build-push.outputs.image }}
           TELEMETRY: ${{ steps.docker-build-push.outputs.telemetry }}
