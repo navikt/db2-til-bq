@@ -12,3 +12,17 @@ spec:
     requests:
       cpu: 200m
       memory: 128Mi
+      
+  envFrom:
+    - secret: oppdrag-q1-credentials
+  
+  env:
+    # Db2
+    - name: DATABASE_HOST
+      value: "155.55.1.82"
+    - name: DATABASE_PORT
+      value: "5025"
+    - name: DATABASE_NAME
+      value: "QDB2"
+    - name: DATABASE_SCHEMA
+      value: "OS231Q1"

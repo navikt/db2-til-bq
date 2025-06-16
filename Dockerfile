@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
