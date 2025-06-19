@@ -35,7 +35,7 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
     storage_credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/key')
     storage_client = storage.Client(project='utsikt-dev-3609', credentials=storage_credentials)
     bucket = storage_client.bucket(bucket_name)
-    print(bucket.list_blobs())
+    print(list(bucket.list_blobs()))
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
 
