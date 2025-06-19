@@ -32,10 +32,10 @@ def read_from_db2(table_name):
     df = pd.read_sql(sql, connection)
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
-    print(os.listdir("/var/run/secrets"))
     storage_credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/key')
     storage_client = storage.Client(project='utsikt-dev-3609', credentials=storage_credentials)
     bucket = storage_client.bucket(bucket_name)
+    print(bucket.list_blobs())
     blob = bucket.blob(source_blob_name)
     blob.download_to_filename(destination_file_name)
 
