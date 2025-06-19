@@ -13,6 +13,10 @@ spec:
       cpu: 200m
       memory: 128Mi
       
+
+  filesFrom:
+    - secret: service-account-key
+  
   envFrom:
     - secret: oppdrag-q1-credentials
   
