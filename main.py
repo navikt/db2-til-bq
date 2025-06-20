@@ -48,7 +48,7 @@ def main():
     storage_client = storage.Client(project='utsikt-dev-3609', credentials=storage_credentials)
     print("storage client: ", storage_client)
 
-    bq_client = bigquery.Client(project='utsikt-dev-3609', credentials=storage_credentials)
+    bq_client = bigquery.Client(project='utsikt-dev-3609')
 
     sql = """
         SELECT * FROM `utsikt-dev-3609.venteregister.test`
