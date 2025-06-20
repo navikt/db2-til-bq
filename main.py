@@ -4,6 +4,7 @@ import pandas as pd
 
 from google.cloud import storage
 from google.oauth2 import service_account
+from google.cloud import bigquery
 import ibm_db
 import ibm_db_sa
 from sqlalchemy import create_engine
@@ -53,7 +54,7 @@ def main():
         SELECT * FROM `utsikt-dev-3609.venteregister.test`
     """
 
-    df = client.query(sql).to_dataframe()
+    df = bq_client.query(sql).to_dataframe()
 
     print(df)
     #bucket = storage_client.bucket('lisens-db2_utsikt-dev-3609')
