@@ -46,7 +46,8 @@ def main():
     print("storage_creds: ", storage_credentials)
     storage_client = storage.Client(project='utsikt-dev-3609', credentials=storage_credentials)
     print(storage_client)
-    print("du er kul")
+    bucket = storage_client.bucket('lisens-db2_utsikt-dev-3609')
+    print(list(bucket.list_blobs()))
     #legge lisensen et sted
     #download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
 
