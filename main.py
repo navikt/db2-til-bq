@@ -45,9 +45,19 @@ def main():
     storage_credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/key')
     print("storage_creds: ", storage_credentials)
     storage_client = storage.Client(project='utsikt-dev-3609', credentials=storage_credentials)
-    print(storage_client)
-    bucket = storage_client.bucket('lisens-db2_utsikt-dev-3609')
-    print(list(bucket.list_blobs()))
+    print("storage client: ", storage_client)
+
+    bq_client = bigquery.Client(project='utsikt-dev-3609', credentials=storage_credentials)
+
+    sql = """
+        SELECT * FROM `utsikt-dev-3609.venteregister.test`
+    """
+
+    df = client.query(sql).to_dataframe()
+
+    print(df)
+    #bucket = storage_client.bucket('lisens-db2_utsikt-dev-3609')
+    #print(list(bucket.list_blobs()))
     #legge lisensen et sted
     #download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
 
