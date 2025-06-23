@@ -1,7 +1,7 @@
+import sys
 
 import os
 import pandas as pd
-
 from google.cloud import storage
 from google.oauth2 import service_account
 # from google.cloud import bigquery
@@ -30,6 +30,7 @@ def read_from_db2(table_name):
     sql = f"select * from {schema}.{table_name}"
 
     print("Starting sql read/extraction")
+    sys.stdout.flush()
     return pd.read_sql(sql, connection)
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
