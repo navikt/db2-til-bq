@@ -43,13 +43,13 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
 
 
 def main():
-    with open("/usr/local/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic") as f:
-        print(f.read())
+    print("Starter jobb, leser lisens")
+    print(f"Lisens finnes: {os.path.isfile("/usr/local/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic"}")
 
     #legge lisensen et sted
     #download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
 
-    #lese inn data fra db2
+    print("lese inn data fra db2")
     df = read_from_db2(table_name = 't_faggruppe')
     print(f"hentet {len(df)} rader")
 
