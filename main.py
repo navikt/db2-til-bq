@@ -43,6 +43,8 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
 
 
 def main():
+    with open("/usr/local/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic") as f:
+        print(f.read())
 
     #legge lisensen et sted
     #download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
