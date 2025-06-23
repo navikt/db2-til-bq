@@ -45,11 +45,11 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
 def main():
 
     #legge lisensen et sted
-    download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
+    #download_blob('lisens-db2_utsikt-dev-3609', 'db2consv_zs.lic', 'db2consv_zs.lic')
 
     #lese inn data fra db2
-    #df = read_from_db2(table_name = 't_faggruppe')
-    #print(f"hentet {len(df)} rader")
+    df = read_from_db2(table_name = 't_faggruppe')
+    print(f"hentet {len(df)} rader")
 
 
 if __name__ == '__main__':
