@@ -1,4 +1,4 @@
-import sys
+#!/usr/bin/env python3
 
 import os
 import pandas as pd
@@ -30,7 +30,6 @@ def read_from_db2(table_name):
     sql = f"select * from {schema}.{table_name}"
 
     print("Starting sql read/extraction")
-    sys.stdout.flush()
     return pd.read_sql(sql, connection)
 
 def download_blob(bucket_name, source_blob_name, destination_file_name):
