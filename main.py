@@ -26,6 +26,9 @@ def read_from_db2(table_name):
         connection = engine.connect()
     except Exception as e:
         print(f"Unable to instantiate DB2 connection:\n{e}")
+        import sys
+        sys.stderr.flush()
+        sys.stdout.flush()
         return []
     print(f"Connection established: {connection=}")
 
