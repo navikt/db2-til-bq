@@ -22,7 +22,11 @@ def read_from_db2(table_name):
 
     engine = create_engine(db2_connection_string)
     print(f"Engine created: {engine=}")
-    connection = engine.connect() 
+    try:
+        connection = engine.connect()
+    except Exception as e:
+        print(f"Unable to instantiate DB2 connection:\n{e}")
+        return []
     print(f"Connection established: {connection=}")
 
     #run query
