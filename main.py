@@ -5,7 +5,7 @@ import pandas as pd
 from google.cloud import storage
 from google.oauth2 import service_account
 # from google.cloud import bigquery
-# import ibm_db
+import ibm_db
 # import ibm_db_sa
 from sqlalchemy import create_engine
 
@@ -21,6 +21,7 @@ def read_from_db2(table_name):
     db2_connection_string = f"db2+ibm_db://{database_username}:{database_password}@{database_host}:{database_port}/{database_name}"
 
     engine = create_engine(db2_connection_string)
+    ibm_db.debug(True)
     print(f"Engine created: {engine=}")
     try:
         connection = engine.connect()
