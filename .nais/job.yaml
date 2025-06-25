@@ -16,7 +16,7 @@ spec:
 
   filesFrom:
     - secret: service-account-key
-    - secret: db2-license
+    - secret: db2-license-11
       mountPath: /var/run/secrets/db2-license
   
   envFrom:
