@@ -1,4 +1,4 @@
-FROM python:3.12
+FROM python:3.12-slim
 
 # Update/install everything non-python
 RUN apt-get update && apt-get install -yq --no-install-recommends \
