@@ -12,21 +12,24 @@ def read_from_db2_2(table_name):
     database_name = os.environ.get("DATABASE_NAME", default="QDB2")
     
     dsn = (
-    f"DRIVER={{IBM DB2 ODBC DRIVER}};"
-    f"DATABASE={database_name};"
-    f"HOSTNAME={database_host};"
-    f"PORT={database_port};"
-    f"PROTOCOL=TCPIP;"
-    f"UID={database_username};"
-    f"PWD={database_password};"
+        f"DRIVER={{IBM DB2 ODBC DRIVER}};"
+        f"DATABASE={database_name};"
+        f"HOSTNAME={database_host};"
+        f"PORT={database_port};"
+        f"PROTOCOL=TCPIP;"
+        f"UID={database_username};"
+        f"PWD={database_password};"
     )
 
     # Establish the connection
     try:
+        ibm_db.debug(True)
         db2_conn = ibm_db.connect(dsn, "", "")
         print("Connected to the database!")
     except:
         print("Failed to connect to the database.")
+        while True:
+            pass
         exit(1)
 
     schema = os.environ.get("DATABASE_SCHEMA", default="OS231Q1")
