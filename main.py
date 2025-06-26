@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import time
 
 import os
 import pandas as pd
@@ -29,7 +30,8 @@ def read_from_db2_2(table_name):
     except:
         print("Failed to connect to the database.")
         while True:
-            pass
+            time.sleep(5 * 60)
+            print("I haz slept 5 min!")
         exit(1)
 
     schema = os.environ.get("DATABASE_SCHEMA", default="OS231Q1")
