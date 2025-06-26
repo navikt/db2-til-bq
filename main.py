@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
+import signal
 import time
 
 import os
 import pandas as pd
 import ibm_db
+
+def handle_segfault(signum, frame):
+    print(f"{signum=}")
+    print(f"{frame=}")
+    while True:
+        time.sleep(5 * 60)
+        print("I haz slept 5 min!")
 
 def read_from_db2_2(table_name):
     database_username = os.environ.get("DATABASE_USERNAME")
@@ -23,8 +31,9 @@ def read_from_db2_2(table_name):
     )
 
     # Establish the connection
+    ibm_db.debug(True)
+    print("Attempting to connect to database.")
     try:
-        ibm_db.debug(True)
         db2_conn = ibm_db.connect(dsn, "", "")
         print("Connected to the database!")
     except:
@@ -54,6 +63,7 @@ def main():
     filen_finnes = os.path.isfile("/usr/local/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic")
     print(f"Ligger lisens der forventet?: {filen_finnes=}")
 
+    signal.signal(signal.SIGSEGV, handle_segfault)
     print("lese inn data fra db2")
     df = read_from_db2_2(table_name = 't_faggruppe')
     print(f"hentet {len(df)} rader")
