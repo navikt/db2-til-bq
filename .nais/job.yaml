@@ -7,7 +7,7 @@ metadata:
   namespace: utsikt
 spec:
   schedule: "0 6 * * *" # Runs every hour
-  image: "{{ image }}"
+  image: "europe-north1-docker.pkg.dev/nais-management-233d/utsikt/venteregister-data:2025.06.27-08.20-d54bc2e"
   resources:
     requests:
       cpu: 200m
@@ -18,10 +18,10 @@ spec:
     - secret: service-account-key
     - secret: db2-license-11
       mountPath: /var/run/secrets/db2-license
-  
+
   envFrom:
     - secret: oppdrag-q1-credentials
-  
+
   env:
     # Db2
     - name: DATABASE_HOST
