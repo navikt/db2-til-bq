@@ -1,29 +1,23 @@
 apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
-  annotations:
-    nais.io/read-only-file-system: "false"
-  labels:
-    team: utsikt
   name: venteregister-data
   namespace: utsikt
+  annotations:
+    nais.io/read-only-file-system: "false"
 spec:
-  schedule: "0 6 * * *" # Runs every hour
-  image: "europe-north1-docker.pkg.dev/nais-management-233d/utsikt/venteregister-data:2025.06.27-08.20-d54bc2e"
+  schedule: "0 6 * * *" # Runs 6 in the morning
   resources:
     requests:
       cpu: 200m
       memory: 128Mi
   webproxy: true
-
   filesFrom:
     - secret: service-account-key
     - secret: db2-license-11
       mountPath: /var/run/secrets/db2-license
-
   envFrom:
     - secret: oppdrag-q1-credentials
-
   env:
     # Db2
     - name: DATABASE_HOST
