@@ -19,4 +19,4 @@ COPY startup.sh .
 COPY main.py .
 
 # Run Python unbuffered to ensure logs are printed immediately using -u
-CMD [ "startup.sh" ]
+CMD [ "./startup.sh" ]
