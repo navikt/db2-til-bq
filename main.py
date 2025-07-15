@@ -22,7 +22,6 @@ def read_from_db2_2(table_name):
     )
 
     # Establish the connection
-    ibm_db.debug(True)
     print("Attempting to connect to database.")
     try:
         db2_conn = ibm_db.connect(dsn, "", "")
@@ -40,20 +39,14 @@ def read_from_db2_2(table_name):
         rows.append(row)
         row = ibm_db.fetch_assoc(stmt)
 
-    df = pd.DataFrame(rows)
-
-    print(f"hentet {len(df)} rader")
-    return(df)
+    return pd.DataFrame(rows)
 
 
 def main():
-    print("Starter jobb")
-    filen_finnes = os.path.isfile("/usr/local/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic")
-    print(f"Ligger lisens der forventet?: {filen_finnes=}")
-
-    print("lese inn data fra db2")
+    print("Lese inn data fra db2")
     df = read_from_db2_2(table_name = 't_faggruppe')
-    print(f"hentet {len(df)} rader")
+    print(f"Hentet {len(df)} rader fra db2")
+    print("TODO: Skriv data til BigQuery")
 
 
 if __name__ == '__main__':
