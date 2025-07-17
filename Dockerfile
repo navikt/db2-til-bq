@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 RUN pip install --upgrade pip
 
-WORKDIR app
+WORKDIR /app
 
 # Install python deps
 COPY requirements.txt .
@@ -18,5 +18,4 @@ RUN chmod a+w /usr/local/lib/python3.12/site-packages/clidriver/license
 COPY startup.sh .
 COPY main.py .
 
-# Run Python unbuffered to ensure logs are printed immediately using -u
 CMD [ "./startup.sh" ]
