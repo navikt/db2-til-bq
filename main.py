@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import ibm_db
 
-def read_from_db2_2(table_name):
+def read_from_db2(table_name):
     database_username = os.environ.get("DATABASE_USERNAME")
     database_password = os.environ.get("DATABASE_PASSWORD")
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
@@ -44,7 +44,7 @@ def read_from_db2_2(table_name):
 
 def main():
     print("Lese inn data fra db2")
-    df = read_from_db2_2(table_name = 't_faggruppe')
+    df = read_from_db2(table_name = 't_faggruppe')
     print(f"Hentet {len(df)} rader fra db2")
     print("TODO: Skriv data til BigQuery")
 
