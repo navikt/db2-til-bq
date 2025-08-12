@@ -18,3 +18,7 @@ spec:
       mountPath: /var/run/secrets/db2-license
   envFrom:
     - secret: oppdrag-q2-credentials
+  gcp:
+    bigQueryDatasets:
+      - name: OS231Q2_kopi
+        permission: READWRITE
