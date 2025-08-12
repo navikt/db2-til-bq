@@ -3,6 +3,7 @@
 import os
 import pandas as pd
 import ibm_db
+from google.cloud import bigquery
 
 def read_from_db2(table_name):
     database_username = os.environ.get("DATABASE_USERNAME")
@@ -41,12 +42,29 @@ def read_from_db2(table_name):
 
     return pd.DataFrame(rows)
 
+def file_to_bq(df, table_name = 't_faggruppe'):
+    #write to BQ from parquet bucket
+    bq_client = bigquery.Client(project='utsikt-dev-3609')
+    DATASET='OS231Q2_kopi'
+
+    table_id = DATASET+'.'+table_name
+
+    job_config = bigquery.LoadJobConfig(
+        autodetect = True,
+        write_disposition = "WRITE_TRUNCATE",
+        create_disposition="CREATE_IF_NEEDED",
+    )
+
+    job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
+    
+    job.result()
 
 def main():
     print("Lese inn data fra db2")
-    df = read_from_db2(table_name = 't_faggruppe')
+    df = read_from_db2(table_name='t_faggruppe')
     print(f"Hentet {len(df)} rader fra db2")
-    print("TODO: Skriv data til BigQuery")
+    print("Skriver til BQ")
+    file_to_bq(df, table_name='t_faggruppe')
 
 
 if __name__ == '__main__':
