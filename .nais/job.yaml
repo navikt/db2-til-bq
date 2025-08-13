@@ -19,6 +19,12 @@ spec:
   envFrom:
     - secret: oppdrag-q2-credentials
   gcp:
+    permissions:
+      - resource:
+          apiVersion: resourcemanager.cnrm.cloud.google.com/v1beta1
+          kind: Project
+          name: utsikt-dev-3609
+        role: roles/bigquery.jobUser
     bigQueryDatasets:
       - name: os231q2_kopi
         permission: READWRITE
