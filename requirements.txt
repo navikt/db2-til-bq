@@ -2,3 +2,4 @@ db-dtypes>=1.4.3
 pandas>=2.2.3
 ibm-db>=3.2.6
 google-cloud-bigquery>=3.33.0
+google-auth>=2.40.2

@@ -4,6 +4,7 @@ import os
 import pandas as pd
 import ibm_db
 from google.cloud import bigquery
+from google.oauth2 import service_account
 
 def read_from_db2(table_name):
     database_username = os.environ.get("DATABASE_USERNAME")
@@ -43,8 +44,9 @@ def read_from_db2(table_name):
     return pd.DataFrame(rows)
 
 def file_to_bq(df, table_name = 't_faggruppe'):
-    #write to BQ from parquet bucket
-    bq_client = bigquery.Client(project='utsikt-dev-3609')
+    #write to BQ from df
+    credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/sa_key.json')
+    bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
     DATASET='OS231Q2_kopi'
 
     table_id = DATASET+'.'+table_name
