@@ -20,5 +20,5 @@ spec:
     - secret: oppdrag-q2-credentials
   gcp:
     bigQueryDatasets:
-      - name: OS231Q2_kopi
+      - name: os231q2_kopi
         permission: READWRITE
