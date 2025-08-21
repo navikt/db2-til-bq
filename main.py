@@ -6,9 +6,13 @@ import ibm_db
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
+local=False
+
 def read_from_db2(table_name):
-    from dotenv import load_dotenv   #for python-dotenv method 
-    load_dotenv()
+    if local:
+        from dotenv import load_dotenv   #for python-dotenv method 
+        load_dotenv()
+
     database_username = os.environ.get("DATABASE_USERNAME")
     database_password = os.environ.get("DATABASE_PASSWORD")
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
@@ -47,12 +51,12 @@ def read_from_db2(table_name):
 
 def file_to_bq(df, table_name = 't_faggruppe'):
     #write to BQ from df
-    run = "remote"
-    if run == "local":
+    if local:
         bq_client = bigquery.Client(project='utsikt-dev-3609')
     else:
         credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/sa_key.json')
         bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+
     DATASET='OS231Q2_kopi'
 
     table_id = DATASET+'.'+table_name
