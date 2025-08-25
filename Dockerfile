@@ -17,7 +17,7 @@ RUN chmod a+w /usr/local/lib/python3.12/site-packages/clidriver/license
 
 COPY startup.sh .
 COPY main.py .
-COPY src .
+COPY src ./src
 
 ENV PYTHONPATH=/app
 
