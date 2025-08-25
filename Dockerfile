@@ -1,18 +1,29 @@
-FROM python:3.12-slim
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# Update/install everything non-python
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    build-essential wget python3-dev libxml2
-
-RUN pip install --upgrade pip
-RUN pip install uv
-
+# Install the project into `/app`
 WORKDIR /app
 
-# Install python deps
-COPY pyproject.toml poetry.lock .
-RUN uv sync --locked --no-install-project --no-dev
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
+
+# Ensure installed tools can be executed out of the box
+ENV UV_TOOL_BIN_DIR=/usr/local/bin
+
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --locked --no-install-project --no-dev
+
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev
 
 # db2client can't follow symlinks, so we need to be able to copy the license file
 RUN chmod a+w /usr/local/lib/python3.12/site-packages/clidriver/license
@@ -20,7 +31,5 @@ RUN chmod a+w /usr/local/lib/python3.12/site-packages/clidriver/license
 COPY startup.sh .
 COPY main.py .
 COPY src ./src
-
-ENV PYTHONPATH=/app
 
 CMD [ "./startup.sh" ]
