@@ -5,6 +5,7 @@ class Table:
     """klasse for å lagre informasjon om kildetabellene våre"""
     name: str
     columns: list
+    col_descriptions: list = None
 
     def build_sql(self, schema: str) -> str:
         query = f"""SELECT {', '.join(self.columns)} 
@@ -76,6 +77,8 @@ tables2 = [
 if __name__ == "__main__":
     schema = "OS231Q2"
 
-    for table in tables2:
+    for table in tables:
         print(table.name)
         print(table.build_sql(schema=schema))
+        if table.col_descriptions:
+            print("there are some descs here")
