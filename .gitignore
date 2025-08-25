@@ -1,6 +1,4 @@
 .python-version
-pyproject.toml
-uv.lock
 .venv
 .env
 .DS_Store
