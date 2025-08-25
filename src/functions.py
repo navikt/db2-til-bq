@@ -5,7 +5,9 @@ import pandas as pd
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-def read_from_db2(table_name, query, local_dev=False):
+from src.config_tables import Table
+
+def read_from_db2(db_table: Table, local_dev=False):
 
     if local_dev:
         from dotenv import load_dotenv
@@ -16,6 +18,7 @@ def read_from_db2(table_name, query, local_dev=False):
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
     database_port = os.environ.get("DATABASE_PORT", default="5025")
     database_name = os.environ.get("DATABASE_NAME", default="QDB2")
+    schema = os.environ.get("DATABASE_SCHEMA", default="OS231Q2")
     
     dsn = (
         f"DRIVER={{IBM DB2 ODBC DRIVER}};"
@@ -36,7 +39,7 @@ def read_from_db2(table_name, query, local_dev=False):
         print("Failed to connect to the database.")
         exit(1)
 
-    stmt = ibm_db.exec_immediate(db2_conn, query)
+    stmt = ibm_db.exec_immediate(db2_conn, db_table.build_sql(schema=schema))
     rows = []
     row = ibm_db.fetch_assoc(stmt)
     while row:
@@ -68,4 +71,6 @@ def file_to_bq(df, table_name = 't_faggruppe', local_dev=False):
     job.result()
 
 if __name__ == "__main__":
-    read_from_db2(table_name='t_faggruppe', local_dev=True)
+    from config_tables import tables
+
+    read_from_db2(db_table=tables[0], local_dev=True)
