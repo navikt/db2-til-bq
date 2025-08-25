@@ -19,4 +19,6 @@ COPY startup.sh .
 COPY main.py .
 COPY src .
 
+ENV PYTHONPATH=/app
+
 CMD [ "./startup.sh" ]
