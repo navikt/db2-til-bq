@@ -2,7 +2,7 @@
 from src.functions import read_from_db2, file_to_bq
 from src.config_tables import tables
 
-local=True # HUSK Å ENDRE FØR PUSH
+local=False # HUSK Å ENDRE FØR PUSH
 
 
 
