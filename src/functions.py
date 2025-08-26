@@ -7,8 +7,15 @@ from google.oauth2 import service_account
 
 from src.config_tables import Table
 
-def read_from_db2(db_table: Table, local_dev=False):
+def _create_bq_client(local_dev: bool = False):
+    if local_dev:
+        bq_client = bigquery.Client(project='utsikt-dev-3609')
+    else:
+        credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/sa_key.json')
+        bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+    return bq_client
 
+def _create_db2_conn(local_dev: bool = False):
     if local_dev:
         from dotenv import load_dotenv
         load_dotenv()
@@ -18,7 +25,6 @@ def read_from_db2(db_table: Table, local_dev=False):
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
     database_port = os.environ.get("DATABASE_PORT", default="5025")
     database_name = os.environ.get("DATABASE_NAME", default="QDB2")
-    schema = os.environ.get("DATABASE_SCHEMA", default="OS231Q2")
     
     dsn = (
         f"DRIVER={{IBM DB2 ODBC DRIVER}};"
@@ -36,41 +42,67 @@ def read_from_db2(db_table: Table, local_dev=False):
         print("Connected to the database!")
     except Exception as e:
         print(e)
-        print("Failed to connect to the database.")
         exit(1)
+    return db2_conn
 
-    stmt = ibm_db.exec_immediate(db2_conn, db_table.build_sql(schema=schema))
+
+
+def get_maxval_tgt(table: Table, local_dev: bool = False):
+    bq_client = _create_bq_client(local_dev=local_dev)
+    
+    DATASET='OS231Q2_kopi'
+    table_id = DATASET+'.'+ table.name
+    max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
+    maxval_tgt = bq_client.query(max_query).result().to_dataframe().iloc[0, 0]
+    return maxval_tgt
+
+def read_from_db2(db_table: Table, local_dev=False, maxval_tgt=None):
+
+    db2_conn = _create_db2_conn(local_dev=local_dev)
+    query = db_table.build_sql(schema=os.environ.get("DATABASE_SCHEMA"), maxval_tgt=maxval_tgt)
+    print(query)
+    stmt = ibm_db.exec_immediate(db2_conn, query)
     rows = []
     row = ibm_db.fetch_assoc(stmt)
     while row:
         rows.append(row)
         row = ibm_db.fetch_assoc(stmt)
 
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    print(f"Hentet {len(df)} rader fra db2")
 
-def file_to_bq(df, table_name = 't_faggruppe', local_dev=False):
+    return df
+
+def write_to_bigquery(df, table_name: str, write_disposition: str, local_dev=False):
     #write to BQ from df
-    if local_dev:
-        bq_client = bigquery.Client(project='utsikt-dev-3609')
-    else:
-        credentials = service_account.Credentials.from_service_account_file('/var/run/secrets/sa_key.json')
-        bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
+    bq_client = _create_bq_client(local_dev=local_dev)
 
     DATASET='OS231Q2_kopi'
-
     table_id = DATASET+'.'+table_name
 
     job_config = bigquery.LoadJobConfig(
         autodetect = True,
-        write_disposition = "WRITE_TRUNCATE",
+        write_disposition = write_disposition,
         create_disposition="CREATE_IF_NEEDED",
     )
 
     job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
     
     job.result()
+    print(f"Written {len(df)} rows to table {table_id} using {write_disposition}")
 
 if __name__ == "__main__":
     from config_tables import tables
-
-    read_from_db2(db_table=tables[0], local_dev=True)
+    local = True
+    for table in tables[2:3]:
+        print(f"Tabell {table.name}:")
+        if table.check_col: #deltalast
+            maxval_tgt = get_maxval_tgt(table = table, local_dev=True)
+            df = read_from_db2(db_table=table, local_dev=local, maxval_tgt=maxval_tgt)
+            print(f"Hentet {len(df)} rader")
+        else: #full last
+            df = read_from_db2(db_table=table, local_dev=local)
+        
+        write_disposition = "WRITE_APPEND" if table.check_col else "WRITE_TRUNCATE"
+        if len(df)>0:
+            write_to_bigquery(df, table_name=table.name, write_disposition=write_disposition, local_dev=local)

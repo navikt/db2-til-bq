@@ -6,72 +6,50 @@ class Table:
     name: str
     columns: list
     col_descriptions: list = None
+    check_col: str = None
 
-    def build_sql(self, schema: str) -> str:
+    def build_sql(self, schema: str, maxval_tgt = None) -> str:
         query = f"""SELECT {', '.join(self.columns)} 
                 FROM {schema}.{self.name}
         """
+        if self.check_col:
+            query = query + f"WHERE {self.check_col} > {maxval_tgt}"
         return query
 
 
 tables = [
     Table(name = "t_faggruppe", columns = ['kode_faggruppe', 'navn_faggruppe']),
     Table(name = "t_fagomraade", columns = ['kode_fagomraade', 'navn_fagomraade', 'kode_faggruppe']),
+    Table(name = "t_vent_beregning", columns = ['beregnings_id', 'dato_beregnet', 'kode_faggruppe'],
+          check_col="beregnings_id"),
+    Table(name = "t_vent_stoppnivaa", columns = ['beregnings_id ',
+                                                'stoppnivaa_id ',
+                                                'oppdrags_id ',
+                                                'fagsystem_id ',
+                                                'type_skatt ',
+                                                'Kode_fagomraade ',
+                                                'dato_periode_fom ',
+                                                'dato_periode_tom ',
+                                                'dato_forfall ',
+                                                'dato_overfores ',],
+                                    col_descriptions=['for kobling ',
+                                                'for kobling. En beregning brytes ned i perioder med tilførende forfalls dato. Stopp nivå ID er en identifikator for de ulike periodene ',
+                                                'for å spore til et oppdrag (muligens ikke så viktig i første omgang, men er fort noe vi kommer til å få bruk for) ',
+                                                'spore tilbake beregningen til vedtaksløsning (muligens ikke så viktig i første omgang, men er fort noe vi kommer til å få bruk for) ',
+                                                'Angir om det er beregnet skatt med prosenttrekk eller tabelltrekk. Med denne kan man oppdage feil hvis skattekort ikke har kunnet blitt innhentet (skjer ikke ofte, men har skjedd) ',
+                                                'filtrere beregninger på fagområde (og faggruppe) ',
+                                                'startsdatoen stoppnivået gjelder for. Sammen med dato_periode_tom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ',
+                                                'startsdatoen stoppnivået gjelder for. Sammen med dato_periode_fom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ',
+                                                'dato for når ytelse skal utbetales. For statistikk og forventningsstyring av utbetalingsforløp ',
+                                                'antakeligvis når ytelse overføres til bank? For statistikk og forventningsstyring av utbetalingsforløp ',
+                                                ]),
+    Table(name='t_vent_stoppstatus', columns=['beregnings_id','stoppnivaa_id','kode_ventestatus','Lopenr','tidspkt_reg'],
+          col_descriptions=['kobling', 'kobling', 'id for ventestatus', 
+                            'tallet er >=1, hopper med steg += 1, 9999 for gjeldendeventestatus',
+                            'tidspunktet ventestatusen er registert. Når siste statusrad settes til lopenr = 9999, så oppdateres også statusen på tidligere rad som hadde gjeldende ventestatus, men oppdatere ikke tidspkt_reg for den tidligere gjeldende statusraden (i.e. tidspkt_reg har kun insert logikk).',
+                            ]),
+    Table(name='t_vent_statuskode', columns=['kode_ventestatus', 'beskrivelse'])
 
-]
-
-
-tables2 = [
-    {
-        "name": "t_faggruppe",
-        "query":"select KODE_FAGGRUPPE, NAVN_FAGGRUPPE from t_faggruppe"
-    },
-    {
-        "name": "t_fagomraade",
-        "query":"select KODE_FAGOMRAADE ,NAVN_FAGOMRAADE,KODE_FAGGRUPPE from t_fagomraade"
-    },
-    {
-        "name": "t_vent_beregning",
-        "query":"select Beregnings_id, dato_beregnet, kode_faggruppe from t_vent_beregning"
-    },
-    {
-        "name": "t_vent_stoppnivaa",
-        "query":"""
-                select
-                Beregnings_id /* for kobling */
-                ,stoppnivaa_id /* for kobling. En beregning brytes ned i perioder med tilførende forfalls dato. Stopp nivå ID er en identifikator for de ulike periodene */
-                ,oppdrags_id /*  for å spore til et oppdrag (muligens ikke så viktig i første omgang, men er fort noe vi kommer til å få bruk for) */
-                ,fagsystem_id /* spore tilbake beregningen til vedtaksløsning (muligens ikke så viktig i første omgang, men er fort noe vi kommer til å få bruk for) */
-                ,type_skatt /* Angir om det er beregnet skatt med prosenttrekk eller tabelltrekk. Med denne kan man oppdage feil hvis skattekort ikke har kunnet blitt innhentet (skjer ikke ofte, men har skjedd) */
-                ,Kode_fagomraade /* filtrere beregninger på fagområde (og faggruppe) */
-                ,dato_periode_fom /* startsdatoen stoppnivået  gjelder for. Sammen med dato_periode_tom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp */
-                ,dato_periode_tom /* startsdatoen stoppnivået  gjelder for. Sammen med dato_periode_fom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp */
-                ,dato_forfall /* dato for når ytelse skal utbetales. For statistikk og forventningsstyring av utbetalingsforløp */
-                ,dato_overfores /* antakeligvis når ytelse overføres til bank? For statistikk og forventningsstyring av utbetalingsforløp */
-                from T_VENT_STOPPNIVAA /* antall beregninger, per fagområde */
-                """
-    },
-    {
-        "name": "t_vent_stoppstatus",
-        "query":"""
-                select
-                beregnings_id /* kobling */
-                ,stoppnivaa_id /* kobling */
-                ,kode_ventestatus /* id for ventestatus */
-                ,Lopenr /* tallet er >=1, hopper med steg += 1, 9999 for gjeldendeventestatus */
-                ,Tidspkt_reg /* tidspunktet ventestatusen er registert. Når siste statusrad settes til lopenr = 9999, så oppdateres også statusen på tidligere rad som hadde gjeldende ventestatus, men oppdatere ikke tidspkt_reg for den tidligere gjeldende statusraden (i.e. tidspkt_reg har kun insert logikk). */
-                from T_VENT_STOPPSTATUS /* oversikt over beregningsflyten og identifisere eventuelle flaskehalser */
-                """
-    },
-    {
-        "name": "t_vent_statuskode",
-        "query":"""
-                select
-                Kode_ventestatus /* id for ventestatus */
-                ,Beskrivelse /* beskrivelsen av ventestatus, for vanskelig å vite hva ventestatusen betyr uten beskrivelsen */
-                from T_VENT_STATUSKODE /* betydning av ventestatuskoden */
-                """
-    },
 ]
 
 if __name__ == "__main__":
@@ -79,6 +57,6 @@ if __name__ == "__main__":
 
     for table in tables:
         print(table.name)
-        print(table.build_sql(schema=schema))
+        print(table.build_sql(schema=schema, maxval_tgt=5))
         if table.col_descriptions:
             print("there are some descs here")
