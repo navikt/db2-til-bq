@@ -1,0 +1,146 @@
+import json
+
+import pandas as pd
+import polars as pl
+import duckdb as dd
+from sqlalchemy import create_engine
+
+
+from cloud_functions import get_gsm_secret
+
+from google.cloud import bigquery
+
+def connect_db2(lokal=True):
+    if lokal:
+        with open("//Users//Linda.Josephine.Claesson//Documents//creds_q2_lcc.json") as json_file:
+            creds = json.load(json_file)
+    else:
+        creds = get_gsm_secret(project_id='utsikt-dev-3609', secret_name='oppdrag-q1-credentials')
+
+
+    #når man kjører fra egen maskin skal man bruke personlig bruker
+    from dotenv import load_dotenv   #for python-dotenv method 
+    load_dotenv()
+    database_username = creds.get('DATABASE_USERNAME')
+    database_password = creds.get('DATABASE_PASSWORD')
+    database_hostname = creds.get('DATABASE_HOSTNAME')
+    database_port = creds.get('DATABASE_PORT')
+    database_name = creds.get('DATABASE_NAME')
+
+
+    # Construct the connection string
+    connection_string = (
+        f"DATABASE={database_name};"
+        f"HOSTNAME={database_hostname};"
+        f"PORT={database_port};"
+        f"PROTOCOL=TCPIP;"
+        f"UID={database_username};"
+        f"PWD={database_password};"
+    )
+
+    # Establish the connection
+    db2_connection_string = f"db2+ibm_db://{database_username}:{database_password}@{database_hostname}:{database_port}/{database_name}"
+
+    engine = create_engine(db2_connection_string)
+    connection = engine.connect()
+
+    return connection
+
+
+def fetch_data_db2(query = None, lokal=True):
+
+    connection = connect_db2(lokal)
+
+    if query:
+        df = pd.read_sql(query, connection)
+        #df = pl.read_database(query, connection)
+        print(f"hentet {len(df)} rader")
+        return df
+    
+    else:
+        raise ValueError
+
+
+
+query_stoppstatus_cnt = f"""
+select
+count(*)
+from OS231Q2.T_VENT_STOPPSTATUS /* oversikt over beregningsflyten og identifisere eventuelle flaskehalser */
+"""
+#df_stoppstatus_cnt = fetch_data_db2(query_stoppstatus_cnt,True)
+#print(df_stoppstatus_cnt)
+
+# Using pandas to only fetch number of rows
+#Q2:     1 098 972 , tok noen sekunder
+#Q1: 1 580 101 119 , tok litt over ett minutt
+
+# Using polars to only fetch number of rows
+#Q2:     1 101 422 , par sekunder
+#Q1: 1 580 101 273 , tok ca 1 min 10 s
+
+query_stoppstatus = f"""
+select
+beregnings_id /* kobling */
+,stoppnivaa_id /* kobling */
+,kode_ventestatus /* id for ventestatus */
+,Lopenr /* tallet er >=1, hopper med steg += 1, 9999 for gjeldendeventestatus */
+,Tidspkt_reg /* tidspunktet ventestatusen er registert. Når siste statusrad settes til lopenr = 9999, så oppdateres også statusen på tidligere rad som hadde gjeldende ventestatus, men oppdatere ikke tidspkt_reg for den tidligere gjeldende statusraden (i.e. tidspkt_reg har kun insert logikk). */
+from OS231Q1.T_VENT_STOPPSTATUS /* oversikt over beregningsflyten og identifisere eventuelle flaskehalser */
+fetch first 1000000 rows only
+"""
+
+df_stoppstatus = fetch_data_db2(query_stoppstatus,False)
+
+query_stoppstatuskode = f"""
+select
+Kode_ventestatus /* id for ventestatus */
+,Beskrivelse /* beskrivelsen av ventestatus, for vanskelig å vite hva ventestatusen betyr uten beskrivelsen */
+from OS231Q2.T_VENT_STATUSKODE /* betydning av ventestatuskoden */
+"""
+#df_statuskode = fetch_data_db2(query_stoppstatuskode)
+
+# Bruke pandas for å hente alle rader med utvalgte kolonner
+#Q2: 1101422, ca 13 s
+#Q1: - stoppet manuelt over 15 min senere.
+
+# Bruke polars for å hente alle rader med utvalgte kolonner
+#Q2: 1101422, ca 14 s
+#Q1 - stoppet manuelt 12 min senere
+
+#Hvis det tar like lang tid med pd vs pl, og pl er foventet å ta kortere tid, kan det være noe med at jeg har brukt sqlalchemy for connect i begge tilfeller? Er det der delay'en er?
+
+# Prøve duckdb
+# Finner ingen måte å kunne bruke duckdb til å hente fra db2. Men kan nok brukes i senere steg.
+
+#Prøve pandas/polars/duckdb rett inn i bq vs mellomlagre i parquet (insert)
+
+# bq_client = bigquery.Client(project='utsikt-dev-3609')
+
+
+# job_config = bigquery.LoadJobConfig(
+#     write_disposition = "WRITE_TRUNCATE",
+#     create_disposition="CREATE_IF_NEEDED",
+# )
+
+# table_id = "venteregister.testing"
+
+# job = bq_client.load_table_from_dataframe(
+#     df_statuskode, table_id, job_config=job_config
+# )  # Make an API request.
+# job.result()  # Wait for the job to complete.
+
+
+
+#load_tale_from_dataframe is tranformed into parquet before insert, so in gcp it reports that the source format is parquet. Er det da noe grunn til å gjøre om til parquet FØR insert i bq?
+
+#ttrenger et mellomstadiet (typ det jeg ville kalt stagig) eller temporary tables, der vi kanskje kun henter de nyeste dataene.
+# Hvordan ville dette sett ut? Skulle vi brukt insert into bq, og så hva da for insert into bq?
+# Kanskje for vent_stoppstatus så hente alle stoppstatusene der et tidspkt_reg > enn det som allerede er registrert i hovedtabellen i bq
+
+
+#sjekket om det var forkjsll på å hentet like mange antall rader fra q2 vs q1, ingen forkjell.
+
+#Prøve pandas/polars/duckdb rett inn i bq vs mellomlagre i parquet (update)
+
+
+# Kanskje neste steg er bare å utforske noe annet en sqlalchemy for hastighet? Og sette opp innlasting av ulike tabeller, noe med delta og andre bare direkte innhenting
