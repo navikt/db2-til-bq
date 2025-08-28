@@ -2,7 +2,7 @@
 from src.functions import get_maxval_tgt, read_from_db2, write_to_bigquery
 from src.config_tables import tables
 
-local=False # HUSK Å ENDRE FØR PUSH
+local=True # HUSK Å ENDRE FØR PUSH
 full_load = False # trenger vi denne?
 
 def main():

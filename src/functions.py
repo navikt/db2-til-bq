@@ -5,7 +5,7 @@ import pandas as pd
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-from config_tables import Table
+from src.class_table import Table
 
 def _create_bq_client(local_dev: bool = False):
     if local_dev:
