@@ -57,7 +57,7 @@ def get_maxval_tgt(table: Table, local_dev: bool = False):
     return maxval_tgt
 
 def read_from_db2(db_table: Table, local_dev=False, maxval_tgt=None):
-
+    ##TODO db2_conn i main, send inn som parameter, slik at vi ikke oppretter ny conn for hver tabell
     db2_conn = _create_db2_conn(local_dev=local_dev)
     query = db_table.build_sql(schema=os.environ.get("DATABASE_SCHEMA"), maxval_tgt=maxval_tgt)
     print(query)
@@ -93,17 +93,4 @@ def write_to_bigquery(df, table_name: str, write_disposition: str, local_dev=Fal
     print(f"Written {len(df)} rows to table {table_id} using {write_disposition} with output bytes: {job.output_bytes}")
 
 if __name__ == "__main__":
-    from config_tables import tables
-    local = True
-    for table in tables[1:2]:
-        print(f"Tabell {table.name}:")
-        if table.check_col: #deltalast
-            maxval_tgt = get_maxval_tgt(table = table, local_dev=local)
-            df = read_from_db2(db_table=table, local_dev=local, maxval_tgt=maxval_tgt)
-            print(f"Hentet {len(df)} rader")
-        else: #full last
-            df = read_from_db2(db_table=table, local_dev=local)
-        
-        write_disposition = "WRITE_APPEND" if table.check_col else "WRITE_TRUNCATE"
-        if len(df)>0:
-            write_to_bigquery(df, table_name=table.name, write_disposition=write_disposition, local_dev=local)
+    print("This is a module, not to be run directly")
