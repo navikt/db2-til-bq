@@ -5,7 +5,7 @@ import pandas as pd
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
-from src.config_tables import Table
+from config_tables import Table
 
 def _create_bq_client(local_dev: bool = False):
     if local_dev:
@@ -89,15 +89,16 @@ def write_to_bigquery(df, table_name: str, write_disposition: str, local_dev=Fal
     job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
     
     job.result()
-    print(f"Written {len(df)} rows to table {table_id} using {write_disposition}")
+    
+    print(f"Written {len(df)} rows to table {table_id} using {write_disposition} with output bytes: {job.output_bytes}")
 
 if __name__ == "__main__":
     from config_tables import tables
     local = True
-    for table in tables[2:3]:
+    for table in tables[1:2]:
         print(f"Tabell {table.name}:")
         if table.check_col: #deltalast
-            maxval_tgt = get_maxval_tgt(table = table, local_dev=True)
+            maxval_tgt = get_maxval_tgt(table = table, local_dev=local)
             df = read_from_db2(db_table=table, local_dev=local, maxval_tgt=maxval_tgt)
             print(f"Hentet {len(df)} rader")
         else: #full last
