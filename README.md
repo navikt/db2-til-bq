@@ -7,6 +7,8 @@ Repoet er ikke åpent grunnet underliggende system er en del av kritisk utbetali
 ## Miljø
 Det er avhengighetene i ```requirements.txt``` som blir brukt i dockerimaget, og som dependabot sjekker. Lokalt brukes [uv](https://docs.astral.sh/uv/) som pakkemanager, og da må vi også kjøre 
 
-```uv pip compile pyproject.toml -o requirements.txt ```
+```uv pip compile pyproject.toml -o requirements.txt```
 
 når vi oppdaterer pakker.
+
+(Var vanskelig å bruke ```pyproject.toml``` for docker og dependabot, men vi ønsker likevel å bruke uv.)
