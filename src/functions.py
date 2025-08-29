@@ -15,11 +15,12 @@ def _create_bq_client(local_dev: bool = False):
         bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
     return bq_client
 
-def _create_db2_conn(local_dev: bool = False):
-    if local_dev:
-        from dotenv import load_dotenv
-        load_dotenv()
+def _set_bq_dataset():
+    db_schema = os.environ.get("DATABASE_SCHEMA")
+    bq_dataset = db_schema[:2]+"_"+db_schema[-2:]
+    return bq_dataset
 
+def _create_db2_conn(local_dev: bool = False):
     database_username = os.environ.get("DATABASE_USERNAME")
     database_password = os.environ.get("DATABASE_PASSWORD")
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
@@ -47,10 +48,9 @@ def _create_db2_conn(local_dev: bool = False):
 
 
 
-def get_maxval_tgt(table: Table, local_dev: bool = False):
-    bq_client = _create_bq_client(local_dev=local_dev)
-    
-    DATASET='OS231Q2_kopi'
+def get_maxval_tgt(table: Table, bq_client):
+      
+    DATASET=_set_bq_dataset()
     table_id = DATASET+'.'+ table.name
     max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
     maxval_tgt = bq_client.query(max_query).result().to_dataframe().iloc[0, 0]
@@ -77,7 +77,7 @@ def write_to_bigquery(df, table_name: str, write_disposition: str, local_dev=Fal
     #write to BQ from df
     bq_client = _create_bq_client(local_dev=local_dev)
 
-    DATASET='OS231Q2_kopi'
+    DATASET=_set_bq_dataset()
     table_id = DATASET+'.'+table_name
 
     job_config = bigquery.LoadJobConfig(

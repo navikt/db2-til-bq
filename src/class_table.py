@@ -9,6 +9,9 @@ class Table:
     col_descriptions: list = None # utsikts beskrivelser av kolonner, og begrunnelse for hvorfor vi henter dem
     check_col: str = None # kolonne vi sjekker for endringer ved deltalast, og en kolonne som sjekker om det trengs full last
 
+    def set_load_method_to_full(self):
+        self.load_method = 'full'
+
     def build_sql(self, schema: str, maxval_tgt = None) -> str:
         query = f"""SELECT {', '.join(self.columns)} 
                 FROM {schema}.{self.name}
