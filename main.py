@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import os 
+
 from src.functions import get_maxval_tgt, read_from_db2, write_to_bigquery
 from src.config_tables import tables
 from src.class_table import Table
 
-#TODO local, dev og prod config
-local=False # HUSK Å ENDRE FØR PUSH
+if 'NAIS_CLUSTER_NAME' in os.environ:
+    local=False 
+else:
+    local=True
+
+print(f"utvikler lokalt: {local}")
 
 def db2_to_bq(table:Table):
 ##TODO force method to overrun load_method listed in config_tables.py
@@ -23,7 +29,7 @@ def db2_to_bq(table:Table):
 
 
 def main():
-    for table in tables[0:3]:
+    for table in tables:
         db2_to_bq(table)
 
 
