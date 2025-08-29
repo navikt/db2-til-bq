@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
-  name: venteregister-data
+  name: db2-til-bq
   namespace: utsikt
   annotations:
     nais.io/read-only-file-system: "false"
