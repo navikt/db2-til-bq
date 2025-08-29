@@ -7,7 +7,7 @@ from google.oauth2 import service_account
 
 from src.class_table import Table
 
-def _create_bq_client(local_dev: bool = False):
+def create_bq_client(local_dev: bool = False):
     if local_dev:
         bq_client = bigquery.Client(project='utsikt-dev-3609')
     else:
@@ -15,12 +15,12 @@ def _create_bq_client(local_dev: bool = False):
         bq_client = bigquery.Client(credentials=credentials, project=credentials.project_id)
     return bq_client
 
-def _set_bq_dataset():
+def set_bq_dataset():
     db_schema = os.environ.get("DATABASE_SCHEMA")
     bq_dataset = db_schema[:2]+"_"+db_schema[-2:]
     return bq_dataset
 
-def _create_db2_conn(local_dev: bool = False):
+def create_db2_conn(local_dev: bool = False):
     database_username = os.environ.get("DATABASE_USERNAME")
     database_password = os.environ.get("DATABASE_PASSWORD")
     database_host = os.environ.get("DATABASE_HOST", default="155.55.1.82")
@@ -48,17 +48,14 @@ def _create_db2_conn(local_dev: bool = False):
 
 
 
-def get_maxval_tgt(table: Table, bq_client):
+def get_maxval_tgt(table: Table, bq_client, table_id):
       
-    DATASET=_set_bq_dataset()
-    table_id = DATASET+'.'+ table.name
     max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
     maxval_tgt = bq_client.query(max_query).result().to_dataframe().iloc[0, 0]
     return maxval_tgt
 
-def read_from_db2(db_table: Table, local_dev=False, maxval_tgt=None):
-    ##TODO db2_conn i main, send inn som parameter, slik at vi ikke oppretter ny conn for hver tabell
-    db2_conn = _create_db2_conn(local_dev=local_dev)
+def read_from_db2(db_table: Table, db2_conn, maxval_tgt=None):
+    
     query = db_table.build_sql(schema=os.environ.get("DATABASE_SCHEMA"), maxval_tgt=maxval_tgt)
     print(query)
     stmt = ibm_db.exec_immediate(db2_conn, query)
@@ -73,12 +70,8 @@ def read_from_db2(db_table: Table, local_dev=False, maxval_tgt=None):
 
     return df
 
-def write_to_bigquery(df, table_name: str, write_disposition: str, local_dev=False):
+def write_to_bigquery(df, bq_client, table_id, write_disposition: str):
     #write to BQ from df
-    bq_client = _create_bq_client(local_dev=local_dev)
-
-    DATASET=_set_bq_dataset()
-    table_id = DATASET+'.'+table_name
 
     job_config = bigquery.LoadJobConfig(
         autodetect = True,
