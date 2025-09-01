@@ -2,8 +2,8 @@ from src.class_table import Table
 
 tables = [
     Table(name = "t_faggruppe", columns = ['kode_faggruppe', 'navn_faggruppe', 'tidspkt_reg'], check_col='tidspkt_reg', load_method='full'),
-    Table(name = "t_fagomraade", columns = ['kode_fagomraade', 'navn_fagomraade', 'kode_faggruppe'], check_col='tidspkt_reg', load_method='full'),
-    Table(name = "t_vent_beregning", columns = ['beregnings_id', 'dato_beregnet', 'kode_faggruppe'], check_col="beregnings_id", load_method='delta'),
+    Table(name = "t_fagomraade", columns = ['kode_fagomraade', 'navn_fagomraade', 'kode_faggruppe', 'tidspkt_reg'], check_col='tidspkt_reg', load_method='full'),
+    Table(name = "t_vent_beregning", columns = ['beregnings_id', 'dato_beregnet', 'kode_faggruppe', 'tidspkt_reg'], check_col='tidspkt_reg', load_method='delta'),
     # Table(name = "t_vent_stoppnivaa", columns = ['beregnings_id ',
     #                                             'stoppnivaa_id ',
     #                                             'oppdrags_id ',

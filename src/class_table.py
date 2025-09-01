@@ -17,6 +17,6 @@ class Table:
                 FROM {schema}.{self.name}
         """
         if self.load_method == 'delta':
-            query = query + f"WHERE {self.check_col} > {maxval_tgt}"
+            query = query + f"WHERE {self.check_col} > '{maxval_tgt}'"
         return query
 
