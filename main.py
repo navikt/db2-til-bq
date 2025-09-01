@@ -4,7 +4,7 @@ import os
 from google.cloud.exceptions import NotFound
 
 from src.functions import get_maxval_tgt, read_from_db2, write_to_bigquery, create_bq_client, set_bq_dataset, create_db2_conn
-from src.config_tables import tables
+from src.config_tables import static_tables, tables
 from src.class_table import Table
 
 if 'NAIS_CLUSTER_NAME' in os.environ:
@@ -45,6 +45,12 @@ def main():
     bq_client = create_bq_client(local_dev=local)
     db2_conn = create_db2_conn(local_dev=local)
     for table in tables:
+        db2_to_bq(table, bq_client, db2_conn)
+
+def run_static_tables():
+    bq_client = create_bq_client(local_dev=local)
+    db2_conn = create_db2_conn(local_dev=local)
+    for table in static_tables:
         db2_to_bq(table, bq_client, db2_conn)
 
 
