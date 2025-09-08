@@ -99,6 +99,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "python-dotenv" },
+    { name = "toml-to-requirements" },
 ]
 
 [package.metadata]
@@ -114,7 +115,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "python-dotenv", specifier = ">=1.1.1" }]
+dev = [
+    { name = "python-dotenv", specifier = ">=1.1.1" },
+    { name = "toml-to-requirements", specifier = ">=0.3.0" },
+]
 
 [[package]]
 name = "google-api-core"
@@ -714,6 +718,27 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/e4/bd78b01919c524f190b4905d47e7630bf4130b9f48fd971ae1c6225b6f6a/sqlalchemy-2.0.43-cp313-cp313-win32.whl", hash = "sha256:7f1ac7828857fcedb0361b48b9ac4821469f7694089d15550bbcf9ab22564a1d", size = 2096718, upload-time = "2025-08-11T15:55:05.349Z" },
     { url = "https://files.pythonhosted.org/packages/ac/a5/ca2f07a2a201f9497de1928f787926613db6307992fe5cda97624eb07c2f/sqlalchemy-2.0.43-cp313-cp313-win_amd64.whl", hash = "sha256:971ba928fcde01869361f504fcff3b7143b47d30de188b11c6357c0505824197", size = 2123200, upload-time = "2025-08-11T15:55:07.932Z" },
     { url = "https://files.pythonhosted.org/packages/b8/d9/13bdde6521f322861fab67473cec4b1cc8999f3871953531cf61945fad92/sqlalchemy-2.0.43-py3-none-any.whl", hash = "sha256:1681c21dd2ccee222c2fe0bef671d1aef7c504087c9c4e800371cfcc8ac966fc", size = 1924759, upload-time = "2025-08-11T15:39:53.024Z" },
+]
+
+[[package]]
+name = "toml"
+version = "0.10.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload-time = "2020-11-01T01:40:22.204Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload-time = "2020-11-01T01:40:20.672Z" },
+]
+
+[[package]]
+name = "toml-to-requirements"
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "toml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/58/8b/97422a77a1391e855c7e07dc2e8201061176aceee0d0a1d6bbbf9056f4c6/toml_to_requirements-0.3.0.tar.gz", hash = "sha256:54b08feb02b0cfea0fbd1d634f06af67a21d5f5616c4a510cddb1a005e07c62f", size = 2821, upload-time = "2024-04-11T03:32:06.359Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/37/da/b633c0c56489848e7320f381665e6262aa6ce0c1d3e9ea4c866361f3f8ed/toml_to_requirements-0.3.0-py3-none-any.whl", hash = "sha256:ccca410f33c360755fc575aba4fe639544f8b5c75a104bb61d3d4da9b4d0e9bb", size = 4256, upload-time = "2024-04-11T03:32:04.802Z" },
 ]
 
 [[package]]

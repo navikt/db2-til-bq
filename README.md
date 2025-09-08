@@ -5,13 +5,13 @@ Naisjobb som henter data fra stormaskin og legger på bigquery.
 Repoet er ikke åpent grunnet underliggende system er en del av kritisk utbetalingsinfrastruktur, og vi refererer til databaseskjemaer og tabellnavn i denne koden.
 
 ## Miljø
-Vi bruker uv for lokal kjøring. Kjør `uv sync` ved første gang man skal kjøre kode lokalt.
+Vi bruker uv for lokal kjøring. Kjør `uv sync` ved første gang man skal kjøre kode lokalt, eller `uv sync --upgrade` for å oppdatere pakker.
 
 Det er avhengighetene i `requirements.txt` som blir brukt i dockerimaget, og som dependabot sjekker. Lokalt brukes [uv](https://docs.astral.sh/uv/) som pakkemanager, og da må vi også kjøre 
 
-`uv pip compile pyproject.toml -o requirements.txt`
+`toml-to-req --toml-file pyproject.toml`
 
-når vi oppdaterer pakker.
+når vi oppdaterer pakker. Her bruker vi pakka [toml-to-requirements](https://pypi.org/project/toml-to-requirements/).
 
 (Var vanskelig å bruke `pyproject.toml` for docker og dependabot, men vi ønsker likevel å bruke uv.)
 
