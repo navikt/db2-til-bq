@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.12
 
 # Update/install everything non-python
 RUN apt-get update && apt-get install -yq --no-install-recommends \
