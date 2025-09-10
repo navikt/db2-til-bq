@@ -1,10 +1,6 @@
 FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.12-dev
 
-# Update/install everything non-python
-RUN apt-get update && apt-get install -yq --no-install-recommends \
-    build-essential wget python3-dev libxml2
-
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip setuptools wheel
 
 WORKDIR /app
 
