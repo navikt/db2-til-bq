@@ -1,21 +1,35 @@
-FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.12-dev
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.12-dev AS builder
 
 WORKDIR /app
+
+USER root
+# Install system dependencies in builder stage
+RUN apk add --no-cache linux-pam
+USER nonroot
+
 RUN python3 -m venv venv
-ENV PATH="/app/venv/bin":$PATH
+ENV PATH=/app/venv/bin:$PATH
 RUN pip install --upgrade pip setuptools wheel
 
 # Install python deps
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# db2client can't follow symlinks, so we need to be able to copy the license file
-RUN chmod a+w /app/venv/lib/python3.12/site-packages/clidriver/license
+# Use distroless images for runtime
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.12
 
-COPY startup.sh .
+# Copy system libraries required by ibm_db from builder
+COPY --from=builder /lib/libpam.so.0 /lib/
+
+# 1069 is enforced user and group ID used by the Nais platform
+COPY --chown=1069:1069 --from=builder /app /app
+
+ENV PATH=/app/venv/bin:$PATH
+ENV PYTHONPATH=/app
+
+WORKDIR /app
+
 COPY main.py .
 COPY src ./src
 
-ENV PYTHONPATH=/app
-
-CMD [ "./startup.sh" ]
+ENTRYPOINT [ "/app/venv/bin/python", "main.py" ]
