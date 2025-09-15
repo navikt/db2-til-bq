@@ -219,4 +219,6 @@ print("--- %.3f seconds ---" % (time.time() - start_time))
 # ibm_db er den grunnleggende pakken for å koble seg til db2. SQLAlchemy kan også brukes til å koble seg til, men er i hovedsak praktisk i det at man kan bruke SQLAlchemy for å koble seg til andre typer databaser, og den tillater deg å skrive enklere python-kode (https://www.cdata.com/blog/what-is-sqlalchemy)
 # Som vi ser det nå (sep 2025) så bruker vi heller ibm_db for så lav kompleksitet som mulig, da vi per nå ikke ser behov for disse fordelene med SQLAlchemy.
 
-# Skal også være mulig å bruke pyodbc på noe vis...
+# Skal og være mulig å koble seg til db2 ved å bruke pyodbc, som er en generell pakke for å koble seg til mange ulike typer databaser (ikke bare ibm db2). Da trenger man en i tillegg en ODBC driver for db2.
+# Ibm_db er spesifikk for IBM Db2, og kommer med Python driver for IBM Db2. Dermed sikkert også raskere enn pyodbc.
+# Kunne sikkert teste hastigheten med pyodbc, men har ikke nødvendigvis tro på at det vil være et bedre alnternativ for oss enn ibm_db.
