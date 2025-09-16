@@ -67,9 +67,13 @@ def read_from_db2(db_table: Table, db2_conn, maxval_tgt=None):
         schema=os.environ.get("DATABASE_SCHEMA"), maxval_tgt=maxval_tgt
     )
     print(query)
-    stmt = ibm_db.exec_immediate(db2_conn, query)
+    stmt = ibm_db.exec_immediate(
+        db2_conn, query
+    )  # With the default forward-only cursor, each call to a fetch method returns the next row in the result set.
     rows = []
-    row = ibm_db.fetch_assoc(stmt)
+    row = ibm_db.fetch_assoc(
+        stmt
+    )  # Returns a dictionary, which is indexed by column name, representing a row in a result set.
     while row:
         rows.append(row)
         row = ibm_db.fetch_assoc(stmt)
