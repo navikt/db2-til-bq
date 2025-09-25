@@ -21,7 +21,7 @@ def copy_db2_license():
     """Copy DB2 license file to the appropriate location if it exists."""
     license_source = Path("/var/run/secrets/db2-license/db2consv_zs.lic")
     license_destination = Path(
-        "/app/venv/lib/python3.12/site-packages/clidriver/license/db2consv_zs.lic"
+        "/app/venv/lib/python3.13/site-packages/clidriver/license/db2consv_zs.lic"
     )
 
     if license_source.exists():
