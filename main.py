@@ -97,3 +97,6 @@ def run_static_tables():
 
 if __name__ == "__main__":
     main()
+
+# TODO lag en testfunksjon slik at man slipper å messe med main
+# TODO gjør oppsett som kjører static tables

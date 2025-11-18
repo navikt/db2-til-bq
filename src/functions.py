@@ -91,6 +91,15 @@ def write_to_bigquery(df, bq_client, table_id, write_disposition: str):
         autodetect=True,
         write_disposition=write_disposition,
         create_disposition="CREATE_IF_NEEDED",
+        time_partitioning=bigquery.table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
+            type_="DAY",
+            field="tidspkt_reg",  # TODO parametere for field
+            expiration_ms=1000
+            * 60
+            * 60
+            * 24
+            * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
+        ),
     )
 
     job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
@@ -98,7 +107,7 @@ def write_to_bigquery(df, bq_client, table_id, write_disposition: str):
     job.result()
 
     print(
-        f"Written {len(df)} rows to table {table_id} using {write_disposition} with output bytes: {job.output_bytes}"
+        f"Written some rows to table {table_id} using {write_disposition} with output bytes: {job.output_bytes}"
     )
 
 
