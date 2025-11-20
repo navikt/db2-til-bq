@@ -3,12 +3,13 @@ from src.class_table import Table
 tables = [
     Table(
         name="t_vent_beregning",
+        table_type="fak",
         columns=["beregnings_id", "dato_beregnet", "kode_faggruppe", "tidspkt_reg"],
         check_col="tidspkt_reg",
-        load_method="delta",
     ),
     Table(
         name="t_vent_stoppnivaa",
+        table_type="fak",
         columns=[
             "beregnings_id ",
             "stoppnivaa_id ",
@@ -35,10 +36,10 @@ tables = [
             "antakeligvis når ytelse overføres til bank? For statistikk og forventningsstyring av utbetalingsforløp ",
         ],
         check_col="tidspkt_reg",
-        load_method="delta",
     ),
     Table(
         name="t_vent_stoppstatus",
+        table_type="fak",
         columns=[
             "beregnings_id",
             "stoppnivaa_id",
@@ -54,28 +55,24 @@ tables = [
             "tidspunktet ventestatusen er registert. Når siste statusrad settes til lopenr = 9999, så oppdateres også statusen på tidligere rad som hadde gjeldende ventestatus, men oppdatere ikke tidspkt_reg for den tidligere gjeldende statusraden (i.e. tidspkt_reg har kun insert logikk).",
         ],
         check_col="tidspkt_reg",
-        load_method="delta",
     ),
-]
-
-static_tables = [
     Table(
         name="t_faggruppe",
+        table_type="dim",
         columns=["kode_faggruppe", "navn_faggruppe", "tidspkt_reg"],
         check_col="tidspkt_reg",
-        load_method="full",
     ),
     Table(
         name="t_fagomraade",
+        table_type="dim",
         columns=["kode_fagomraade", "navn_fagomraade", "kode_faggruppe", "tidspkt_reg"],
         check_col="tidspkt_reg",
-        load_method="full",
     ),
     Table(
         name="t_vent_statuskode",
+        table_type="dim",
         columns=["kode_ventestatus", "beskrivelse", "tidspkt_reg"],
         check_col="tidspkt_reg",
-        load_method="full",
     ),
 ]
 

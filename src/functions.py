@@ -61,10 +61,12 @@ def get_maxval_tgt(table: Table, bq_client, table_id):
     return maxval_tgt
 
 
-def read_from_db2(db_table: Table, db2_conn, maxval_tgt=None):
+def read_from_db2(db_table: Table, db2_conn, load_method, maxval_tgt=None):
 
     query = db_table.build_sql(
-        schema=os.environ.get("DATABASE_SCHEMA"), maxval_tgt=maxval_tgt
+        schema=os.environ.get("DATABASE_SCHEMA"),
+        load_method=load_method,
+        maxval_tgt=maxval_tgt,
     )
     print(query)
     stmt = ibm_db.exec_immediate(
@@ -84,23 +86,29 @@ def read_from_db2(db_table: Table, db2_conn, maxval_tgt=None):
     return df
 
 
-def write_to_bigquery(df, bq_client, table_id, write_disposition: str):
+def write_to_bigquery(df, bq_client, table_id, table_type, write_disposition: str):
     # write to BQ from df
-
-    job_config = bigquery.LoadJobConfig(
-        autodetect=True,
-        write_disposition=write_disposition,
-        create_disposition="CREATE_IF_NEEDED",
-        time_partitioning=bigquery.table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
-            type_="DAY",
-            field="tidspkt_reg",  # TODO parametere for field
-            expiration_ms=1000
-            * 60
-            * 60
-            * 24
-            * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
-        ),
-    )
+    if table_type == "fak":
+        job_config = bigquery.LoadJobConfig(
+            autodetect=True,
+            write_disposition=write_disposition,
+            create_disposition="CREATE_IF_NEEDED",
+            time_partitioning=bigquery.table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
+                type_="DAY",
+                field="tidspkt_reg",  # TODO parametere for field
+                expiration_ms=1000
+                * 60
+                * 60
+                * 24
+                * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
+            ),
+        )
+    else:  # dim
+        job_config = bigquery.LoadJobConfig(
+            autodetect=True,
+            write_disposition=write_disposition,
+            create_disposition="CREATE_IF_NEEDED",
+        )
 
     job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
 
