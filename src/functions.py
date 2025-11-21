@@ -8,19 +8,6 @@ from google.oauth2 import service_account
 from src.class_table import Table
 
 
-def create_bq_client(local_dev: bool = False):
-    if local_dev:
-        bq_client = bigquery.Client(project="utsikt-dev-3609")
-    else:
-        credentials = service_account.Credentials.from_service_account_file(
-            "/var/run/secrets/sa_key.json"
-        )
-        bq_client = bigquery.Client(
-            credentials=credentials, project=credentials.project_id
-        )
-    return bq_client
-
-
 def set_bq_dataset():
     db_schema = os.environ.get("DATABASE_SCHEMA")
     bq_dataset = db_schema[:2] + "_" + db_schema[-2:]
@@ -52,13 +39,6 @@ def create_db2_conn(local_dev: bool = False):
         print(e)
         exit(1)
     return db2_conn
-
-
-def get_maxval_tgt(table: Table, bq_client, table_id):
-
-    max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
-    maxval_tgt = bq_client.query(max_query).result().to_dataframe().iloc[0, 0]
-    return maxval_tgt
 
 
 def read_from_db2(db_table: Table, db2_conn, load_method, maxval_tgt=None):

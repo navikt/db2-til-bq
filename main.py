@@ -96,13 +96,7 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
 
     if len(df) > 0:
         bq_client.put_dataframe(df, table_id, write_disposition, table.table_type)
-        # write_to_bigquery(
-        #     df,
-        #     bq_client=bq_client,
-        #     table_id=table_id,
-        #     table_type=table.table_type,
-        #     write_disposition=write_disposition,
-        # )
+
     elif load_method == "delta":
         print(f"Ingen nye rader å laste for tabell {table.name}")
     else:
