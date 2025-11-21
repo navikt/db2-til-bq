@@ -86,38 +86,5 @@ def read_from_db2(db_table: Table, db2_conn, load_method, maxval_tgt=None):
     return df
 
 
-def write_to_bigquery(df, bq_client, table_id, table_type, write_disposition: str):
-    # write to BQ from df
-    if table_type == "fak":
-        job_config = bigquery.LoadJobConfig(
-            autodetect=True,
-            write_disposition=write_disposition,
-            create_disposition="CREATE_IF_NEEDED",
-            time_partitioning=bigquery.table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
-                type_="DAY",
-                field="tidspkt_reg",  # TODO parametere for field
-                expiration_ms=1000
-                * 60
-                * 60
-                * 24
-                * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
-            ),
-        )
-    else:  # dim
-        job_config = bigquery.LoadJobConfig(
-            autodetect=True,
-            write_disposition=write_disposition,
-            create_disposition="CREATE_IF_NEEDED",
-        )
-
-    job = bq_client.load_table_from_dataframe(df, table_id, job_config=job_config)
-
-    job.result()
-
-    print(
-        f"Written some rows to table {table_id} using {write_disposition} with output bytes: {job.output_bytes}"
-    )
-
-
 if __name__ == "__main__":
     print("This is a module, not to be run directly")

@@ -2,14 +2,10 @@
 import os
 import shutil
 from pathlib import Path
-
-from google.cloud.exceptions import NotFound
+from src.bigquery_connector import BQConnector
 
 from src.functions import (
-    get_maxval_tgt,
     read_from_db2,
-    write_to_bigquery,
-    create_bq_client,
     set_bq_dataset,
     create_db2_conn,
 )
@@ -51,19 +47,6 @@ if not local:
     copy_db2_license()
 
 
-def check_if_table_exists_in_bq(bq_client, table_id):
-    # Check if table exists in BQ, and set appropriate load method.
-    try:
-        bq_client.get_table(table_id)  # Make an API request.
-        table_exists_in_bq = True
-        print("Tabellen {} finnes i BQ.".format(table_id))
-    except NotFound:
-        table_exists_in_bq = False
-        print("Tabellen {} finnes ikke i BQ.".format(table_id))
-
-    return table_exists_in_bq
-
-
 def db2_to_bq(table: Table, bq_client, db2_conn):
     print(f"-----{table.name}-----")  # print for å skille tabellene i loggen
 
@@ -79,16 +62,16 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
 
     elif table.table_type == "fak":
 
-        table_exists_in_bq = check_if_table_exists_in_bq(bq_client, table_id)
+        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id)
 
         if table_exists_in_bq:
             load_method = "delta"
             print(
                 f"{table.table_type}tabell {table.name} med {load_method} load method"
             )
-            maxval_tgt = get_maxval_tgt(
-                table=table, bq_client=bq_client, table_id=table_id
-            )
+            max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
+            maxval_tgt = bq_client.get_rows_as_dataframe(max_query).iloc[0, 0]
+
             df = read_from_db2(
                 db_table=table,
                 db2_conn=db2_conn,
@@ -112,13 +95,14 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
         )
 
     if len(df) > 0:
-        write_to_bigquery(
-            df,
-            bq_client=bq_client,
-            table_id=table_id,
-            table_type=table.table_type,
-            write_disposition=write_disposition,
-        )
+        bq_client.put_dataframe(df, table_id, write_disposition, table.table_type)
+        # write_to_bigquery(
+        #     df,
+        #     bq_client=bq_client,
+        #     table_id=table_id,
+        #     table_type=table.table_type,
+        #     write_disposition=write_disposition,
+        # )
     elif load_method == "delta":
         print(f"Ingen nye rader å laste for tabell {table.name}")
     else:
@@ -126,7 +110,9 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
 
 
 def main():
-    bq_client = create_bq_client(local_dev=local)
+    # bq_client = create_bq_client(local_dev=local)
+    os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"
+    bq_client = BQConnector()
     db2_conn = create_db2_conn(local_dev=local)
 
     for table in tables:
