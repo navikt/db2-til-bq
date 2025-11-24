@@ -2,9 +2,12 @@ import os
 import ibm_db
 import pandas as pd
 
+from datetime import datetime, timedelta
+
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
+from src.bigquery_connector import BQConnector
 from src.class_table import Table
 
 
@@ -39,6 +42,18 @@ def create_db2_conn(local_dev: bool = False):
         print(e)
         exit(1)
     return db2_conn
+
+def get_from_date(bq_client: BQConnector, table: Table, table_id: str, table_exists_in_bq: bool) -> datetime:
+
+    if table_exists_in_bq:
+        max_query = f"SELECT MAX({table.check_col}) FROM {table_id}"
+        from_date = bq_client.get_rows_as_dataframe(max_query).iloc[0, 0]
+
+    else:
+        from_date = datetime.today() - timedelta(days=730)
+
+
+    return from_date
 
 
 def read_from_db2(db_table: Table, db2_conn, load_method, maxval_tgt=None):

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -13,13 +14,20 @@ class Table:
     )
     check_col: str = None  # kolonne vi sjekker for endringer ved deltalast
 
-    def build_sql(self, schema: str, load_method, maxval_tgt=None) -> str:
+    def build_sql(self, schema: str, load_method) -> str:
         query = f"""SELECT {', '.join(self.columns)} 
                 FROM {schema}.{self.name}
         """
         if load_method == "delta":
-            query = query + f"WHERE {self.check_col} > '{maxval_tgt}'"
+            query = query + f"WHERE {self.check_col} > ? "
+
         return query
+
+    @staticmethod
+    def generate_binds(max_value_in_target = None ) -> Dict[int, Any]:
+        binds = {1: max_value_in_target}
+
+        return binds
 
     def build_sql_init(self, schema: str, offset: int, chunk_size: int) -> str:
         query = f"""SELECT {', '.join(self.columns)} 
