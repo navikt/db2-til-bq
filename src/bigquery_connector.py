@@ -33,7 +33,7 @@ class BQConnector:
         return self._format_results(query_job=query_job)
 
     def put_dataframe(
-        self, df: DataFrame, table_id: str, write_disposition: str, table_type: str
+        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
     ) -> None:
         """
         Laster opp en Dataframe til gitt tabell og write_disposition
@@ -47,9 +47,6 @@ class BQConnector:
         Returns (None): Skriver ut resultater av jobben.
 
         """
-        job_config = self._create_write_job_config(
-            write_disposition=write_disposition, table_type=table_type
-        )
         job = self.client.load_table_from_dataframe(
             dataframe=df, destination=table_id, job_config=job_config
         )

@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass, field
 from typing import Any, Dict, Optional, List
-from google.cloud.bigquery import SchemaField
+from google.cloud.bigquery import SchemaField, LoadJobConfig, table
 from enum import Enum
 
 
@@ -37,6 +37,31 @@ class Table:
             query = query + f"WHERE {self.check_col} > ? "
 
         return query
+
+    def make_bq_load_jobconfig(self, write_disposition: str) -> LoadJobConfig:
+        if self.table_type == TableType.FAK:
+            job_config = LoadJobConfig(
+                schema=self.cols,
+                write_disposition=write_disposition,
+                create_disposition="CREATE_IF_NEEDED",
+                time_partitioning=table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
+                    type_="DAY",
+                    field="tidspkt_reg",  # TODO parametere for field
+                    expiration_ms=1000
+                    * 60
+                    * 60
+                    * 24
+                    * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
+                ),
+            )
+        else:  # dim
+            job_config = LoadJobConfig(
+                schema=self.cols,
+                write_disposition=write_disposition,
+                create_disposition="CREATE_IF_NEEDED",
+            )
+
+        return job_config
 
     @staticmethod
     def generate_binds(max_value_in_target=None) -> Dict[int, Any]:

@@ -91,13 +91,9 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
         )
 
     if len(df) > 0:
-        bq_client.put_dataframe(
-            df,
-            table_id=table.bq_table_id,
-            write_disposition=write_disposition,
-            table_type=table.table_type,
-        )
-        # table_type blir brukt til å sette time partitions på fak tabeller i job config.
+        df.columns = df.columns.str.lower()
+        job_config = table.make_bq_load_jobconfig(write_disposition=write_disposition)
+        bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
 
     else:
         print(f"Ingen nye rader å laste for tabell {table.name}")
