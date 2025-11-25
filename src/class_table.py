@@ -8,14 +8,16 @@ class Table:
 
     name: str  # tabellnavn
     table_type: str  # type tabell, dim eller fak. Brukes for å styre lastemetode.
-    columns: list  # kolonner vi skal hente
-    col_descriptions: list = (
-        None  # utsikts beskrivelser av kolonner, og begrunnelse for hvorfor vi henter dem
-    )
+    cols: list
+    # columns: list  # kolonner vi skal hente
+    # col_descriptions: list = (
+    #    None  # utsikts beskrivelser av kolonner, og begrunnelse for hvorfor vi henter dem
+    # )
     check_col: str = None  # kolonne vi sjekker for endringer ved deltalast
 
     def build_sql(self, schema: str, load_method) -> str:
-        query = f"""SELECT {', '.join(self.columns)} 
+        column_names = [col.name for col in self.cols]
+        query = f"""SELECT {', '.join(column_names)} 
                 FROM {schema}.{self.name}
         """
         if load_method == "delta":
@@ -24,7 +26,7 @@ class Table:
         return query
 
     @staticmethod
-    def generate_binds(max_value_in_target = None ) -> Dict[int, Any]:
+    def generate_binds(max_value_in_target=None) -> Dict[int, Any]:
         binds = {1: max_value_in_target}
 
         return binds
