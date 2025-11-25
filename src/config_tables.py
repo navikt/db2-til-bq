@@ -34,52 +34,52 @@ tables = [
         table_type=TableType.FAK,
         cols=[
             SchemaField(
-                name="beregnings_id ",
+                name="beregnings_id",
                 field_type="INTEGER",
                 description="Unik identifikator for en utført beregning i Oppdrag Z.",
             ),
             SchemaField(
-                name="stoppnivaa_id ",
+                name="stoppnivaa_id",
                 field_type="INTEGER",
                 description="En beregning brytes ned i f.eks. perioder med tilhørende forfallsdato. Stoppnivå er et begrep i Oppdrag Z bruker for en slik nødvendig nebrytning. Stoppnivå id samt beregnings id unikt identifiserer et stoppnivå fra en beregning.",
             ),
             SchemaField(
-                name="oppdrags_id ",
+                name="oppdrags_id",
                 field_type="INTEGER",
                 description="Identifikator på utbetalingsoppdraget, unik identifikator som oppdrag Z oppretter når man mottar ett vedtak til utbetaling fra fagsystem.",
             ),
             SchemaField(
-                name="fagsystem_id ",
+                name="fagsystem_id",
                 field_type="STRING",
                 description="Identifikator fra vedtaksløsningen som har avlevert ett utbetalingsoppdrag",
             ),
             SchemaField(
-                name="type_skatt ",
+                name="type_skatt",
                 field_type="STRING",
                 description="Angir om det er beregnet skatt med prosenttrekk eller tabelltrekk. Med denne kan man oppdage feil hvis skattekort ikke har kunnet blitt innhentet (skjer ikke ofte, men har skjedd) ",
             ),
             SchemaField(
-                name="Kode_fagomraade ",
+                name="kode_fagomraade",
                 field_type="STRING",
                 description="En kode som angir selve ytelsen som beregningen gjelder, f.eks. 'AAP' for arbeidsavklaringspenger",
             ),
             SchemaField(
-                name="dato_periode_fom ",
+                name="dato_periode_fom",
                 field_type="DATE",
                 description="Startsdatoen stoppnivået gjelder for. Sammen med dato_periode_tom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ",
             ),
             SchemaField(
-                name="dato_periode_tom ",
+                name="dato_periode_tom",
                 field_type="DATE",
                 description="Sluttdatoen stoppnivået gjelder for. Sammen med dato_periode_fom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ",
             ),
             SchemaField(
-                name="dato_forfall ",
+                name="dato_forfall",
                 field_type="DATE",
                 description="Dato for når ytelse skal utbetales.",
             ),
             SchemaField(
-                name="dato_overfores ",
+                name="dato_overfores",
                 field_type="DATE",
                 description="Antakeligvis når ytelse overføres til bank?",
             ),
@@ -111,7 +111,7 @@ tables = [
                 description="Identifikator for status på stoppnivået i venteregisteret, eks OVFO (for 'Overført til UR')",
             ),
             SchemaField(
-                name="Lopenr",
+                name="lopenr",
                 field_type="INTEGER",
                 description="Tall som er >=1, hopper med steg += 1, 9999 markerer gjeldende ventestatus",
             ),
