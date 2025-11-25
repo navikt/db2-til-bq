@@ -6,7 +6,6 @@ from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
 
 from src.functions import get_from_date, set_bq_dataset
-from src.config_tables import tables
 from src.class_table import Table, TableType
 
 
@@ -54,32 +53,28 @@ if not local:
 def db2_to_bq(table: Table, bq_client, db2_conn):
     print(f"-----{table.name}-----")  # print for å skille tabellene i loggen
 
-    # Set dataset and table id
-    DATASET = set_bq_dataset()
-    table_id = DATASET + "." + table.name
-
     if table.table_type == TableType.DIM:
-        load_method = "full"
-        print(f"{table.table_type}tabell {table.name} med {load_method} load method")
-        # df = read_from_db2(db_table=table, db2_conn=db2_conn, load_method=load_method)
-        query = table.build_sql(
-            schema=os.environ.get("DATABASE_SCHEMA"), load_method=load_method
-        )
+
+        print(f"{table.table_type.value} tabell {table.name} ")
+        query = table.build_sql_db2()
         binds = {}
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
 
         write_disposition = "WRITE_TRUNCATE"
 
     elif table.table_type == TableType.FAK:
-        load_method = "delta"
-        table_id = f"{set_bq_dataset()}.{table.name}"
 
-        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id)
-        date_from = get_from_date(bq_client, table, table_id, table_exists_in_bq)
-
-        query = table.build_sql(
-            schema=os.environ.get("DATABASE_SCHEMA"), load_method=load_method
+        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(
+            table_id=table.bq_table_id
         )
+        date_from = get_from_date(
+            bq_client,
+            table,
+            table_id=table.bq_table_id,
+            table_exists_in_bq=table_exists_in_bq,
+        )
+
+        query = table.build_sql_db2()
         binds = table.generate_binds(max_value_in_target=date_from)
 
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
@@ -96,20 +91,23 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
         )
 
     if len(df) > 0:
-        bq_client.put_dataframe(df, table_id, write_disposition, table.table_type)
+        bq_client.put_dataframe(
+            df,
+            table_id=table.bq_table_id,
+            write_disposition=write_disposition,
+            table_type=table.table_type,
+        )
         # table_type blir brukt til å sette time partitions på fak tabeller i job config.
 
-    elif load_method == "delta":
-        print(f"Ingen nye rader å laste for tabell {table.name}")
     else:
-        print(f"Ingen rader hentet fra kildetabell {table.name}")
+        print(f"Ingen nye rader å laste for tabell {table.name}")
 
 
 def main():
-    # bq_client = create_bq_client(local_dev=local)
-    os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"
+    from src.config_tables import tables
+
+    os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
     bq_client = BQConnector()
-    # db2_conn = create_db2_conn(local_dev=local)
     db2_conn = DB2Connector(
         database_name=os.environ["DATABASE_NAME"],
         username=os.environ["DATABASE_USERNAME"],
