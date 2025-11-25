@@ -1,5 +1,12 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
+from google.cloud.bigquery import SchemaField
+from enum import Enum
+
+
+class TableType(Enum):
+    DIM = "dim"
+    FAK = "fak"
 
 
 @dataclass
@@ -7,12 +14,8 @@ class Table:
     """klasse for å lagre informasjon om kildetabellene våre"""
 
     name: str  # tabellnavn
-    table_type: str  # type tabell, dim eller fak. Brukes for å styre lastemetode.
-    cols: list
-    # columns: list  # kolonner vi skal hente
-    # col_descriptions: list = (
-    #    None  # utsikts beskrivelser av kolonner, og begrunnelse for hvorfor vi henter dem
-    # )
+    table_type: TableType  # type tabell, dim eller fak. Brukes for å styre lastemetode.
+    cols: List[SchemaField]
     check_col: str = None  # kolonne vi sjekker for endringer ved deltalast
 
     def build_sql(self, schema: str, load_method) -> str:
@@ -30,11 +33,3 @@ class Table:
         binds = {1: max_value_in_target}
 
         return binds
-
-    def build_sql_init(self, schema: str, offset: int, chunk_size: int) -> str:
-        query = f"""SELECT {', '.join(self.columns)} 
-                FROM {schema}.{self.name}
-                OFFSET {offset} ROWS 
-                FETCH NEXT {chunk_size} ROWS ONLY
-                """
-        return query

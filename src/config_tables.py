@@ -1,10 +1,10 @@
-from src.class_table import Table
+from src.class_table import Table, TableType
 from google.cloud.bigquery import SchemaField
 
 tables = [
     Table(
         name="t_vent_beregning",
-        table_type="fak",
+        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
@@ -31,7 +31,7 @@ tables = [
     ),
     Table(
         name="t_vent_stoppnivaa",
-        table_type="fak",
+        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id ",
@@ -93,7 +93,7 @@ tables = [
     ),
     Table(
         name="t_vent_stoppstatus",
-        table_type="fak",
+        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
@@ -125,7 +125,7 @@ tables = [
     ),
     Table(
         name="t_faggruppe",
-        table_type="dim",
+        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_faggruppe",
@@ -147,7 +147,7 @@ tables = [
     ),
     Table(
         name="t_fagomraade",
-        table_type="dim",
+        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_fagomraade",
@@ -174,7 +174,7 @@ tables = [
     ),
     Table(
         name="t_vent_statuskode",
-        table_type="dim",
+        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_ventestatus",

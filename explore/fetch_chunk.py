@@ -4,6 +4,15 @@ import pandas as pd
 from src.class_table import Table
 
 
+def build_sql_init(self, schema: str, offset: int, chunk_size: int) -> str:
+    query = f"""SELECT {', '.join(self.columns)} 
+                FROM {schema}.{self.name}
+                OFFSET {offset} ROWS 
+                FETCH NEXT {chunk_size} ROWS ONLY
+                """
+    return query
+
+
 def fetch_data_chunk(db2_conn, query):
     """
     Fetches a chunk of data from the database table.

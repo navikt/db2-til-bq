@@ -5,12 +5,9 @@ from pathlib import Path
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
 
-from src.functions import (
-    get_from_date,
-    set_bq_dataset
-)
+from src.functions import get_from_date, set_bq_dataset
 from src.config_tables import tables
-from src.class_table import Table
+from src.class_table import Table, TableType
 
 
 def copy_db2_license():
@@ -40,10 +37,12 @@ else:
 
     load_dotenv()
 
+
 def check_envs():
-    #Hvis den ikke finner variabler i miljøet
-    #prøv å laster fra .env
+    # Hvis den ikke finner variabler i miljøet
+    # prøv å laster fra .env
     pass
+
 
 print(f"utvikler lokalt: {local}")
 
@@ -59,28 +58,31 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
     DATASET = set_bq_dataset()
     table_id = DATASET + "." + table.name
 
-    if table.table_type == "dim":
+    if table.table_type == TableType.DIM:
         load_method = "full"
         print(f"{table.table_type}tabell {table.name} med {load_method} load method")
-        #df = read_from_db2(db_table=table, db2_conn=db2_conn, load_method=load_method)
-        query = table.build_sql(schema=os.environ.get("DATABASE_SCHEMA"),load_method=load_method)
+        # df = read_from_db2(db_table=table, db2_conn=db2_conn, load_method=load_method)
+        query = table.build_sql(
+            schema=os.environ.get("DATABASE_SCHEMA"), load_method=load_method
+        )
         binds = {}
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
 
         write_disposition = "WRITE_TRUNCATE"
 
-    elif table.table_type == "fak":
+    elif table.table_type == TableType.FAK:
         load_method = "delta"
         table_id = f"{set_bq_dataset()}.{table.name}"
 
         table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id)
         date_from = get_from_date(bq_client, table, table_id, table_exists_in_bq)
 
-        query = table.build_sql(schema=os.environ.get("DATABASE_SCHEMA"),load_method=load_method)
+        query = table.build_sql(
+            schema=os.environ.get("DATABASE_SCHEMA"), load_method=load_method
+        )
         binds = table.generate_binds(max_value_in_target=date_from)
 
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
-
 
         if table_exists_in_bq:
             write_disposition = "WRITE_APPEND"
@@ -95,7 +97,7 @@ def db2_to_bq(table: Table, bq_client, db2_conn):
 
     if len(df) > 0:
         bq_client.put_dataframe(df, table_id, write_disposition, table.table_type)
-        #table_type blir brukt til å sette time partitions på fak tabeller i job config.
+        # table_type blir brukt til å sette time partitions på fak tabeller i job config.
 
     elif load_method == "delta":
         print(f"Ingen nye rader å laste for tabell {table.name}")
@@ -107,26 +109,26 @@ def main():
     # bq_client = create_bq_client(local_dev=local)
     os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"
     bq_client = BQConnector()
-    #db2_conn = create_db2_conn(local_dev=local)
-    db2_conn = DB2Connector(database_name=os.environ["DATABASE_NAME"],
-                            username=os.environ["DATABASE_USERNAME"],
-                            password=os.environ["DATABASE_PASSWORD"],
-                            port=os.environ["DATABASE_PORT"],
-                            host=os.environ["DATABASE_HOST"])
+    # db2_conn = create_db2_conn(local_dev=local)
+    db2_conn = DB2Connector(
+        database_name=os.environ["DATABASE_NAME"],
+        username=os.environ["DATABASE_USERNAME"],
+        password=os.environ["DATABASE_PASSWORD"],
+        port=os.environ["DATABASE_PORT"],
+        host=os.environ["DATABASE_HOST"],
+    )
 
     for table in tables:
         db2_to_bq(table, bq_client, db2_conn)
 
 
 def db2_to_bq_pseudo():
-    #sjekker tabell type
+    # sjekker tabell type
     # Hvis tabell type = "dim" -> full last
     # Hvis tabell type = "fak" -> Må sette fra_dato
     #   Hvis tabell finnes i BQ hentes fra_dato i BQ
     #   Hvis ikke sette fra_data = i dag - minus 2 år
     pass
-
-
 
 
 if __name__ == "__main__":
@@ -135,7 +137,3 @@ if __name__ == "__main__":
     # - Mer av logikken til klassen Tabel
     # - Gjør om config tables til BQ Schema fields
     # - Skrive tabellbeskrivelse til BQ
-
-
-
-
