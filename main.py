@@ -5,7 +5,7 @@ from pathlib import Path
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
 
-from src.functions import get_from_date, set_bq_dataset
+from src.functions import get_from_datetime
 from src.class_table import Table, TableType
 
 
@@ -50,50 +50,37 @@ if not local:
     copy_db2_license()
 
 
-def db2_to_bq(table: Table, bq_client, db2_conn):
-    print(f"-----{table.name}-----")  # print for å skille tabellene i loggen
+def db2_to_bq(table: Table, bq_client: BQConnector, db2_conn: DB2Connector):
+    print(f"-----{table.name}-----")
+    print(f"{table.table_type.value} tabell {table.name} ")
+
+    write_disposition = "WRITE_TRUNCATE"
+
 
     if table.table_type == TableType.DIM:
-
-        print(f"{table.table_type.value} tabell {table.name} ")
         query = table.build_sql_db2()
-        binds = {}
-        df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
-
-        write_disposition = "WRITE_TRUNCATE"
+        df = db2_conn.get_rows_as_dataframe(query=query)
 
     elif table.table_type == TableType.FAK:
 
-        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(
-            table_id=table.bq_table_id
-        )
-        date_from = get_from_date(
-            bq_client,
-            table,
-            table_id=table.bq_table_id,
-            table_exists_in_bq=table_exists_in_bq,
-        )
-
+        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id=table.bq_table_id)
+        from_datetime = get_from_datetime(bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq)
         query = table.build_sql_db2()
-        binds = table.generate_binds(max_value_in_target=date_from)
-
+        binds = table.generate_binds(from_datetime=from_datetime)
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
 
         if table_exists_in_bq:
             write_disposition = "WRITE_APPEND"
 
-        else:
-            write_disposition = "WRITE_TRUNCATE"
-
     else:
-        raise ValueError(
-            f"Ukjent table_type {table.table_type} for tabell {table.name}."
-        )
+        raise ValueError(f"Ukjent table_type {table.table_type} for tabell {table.name}.")
 
     if len(df) > 0:
         df.columns = df.columns.str.lower()
-        job_config = table.make_bq_load_jobconfig(write_disposition=write_disposition)
+        job_config = table.make_bq_load_job_config(write_disposition=write_disposition)
         bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
+
+        print(f"{len(df)} rows written to {table.name}")
 
     else:
         print(f"Ingen nye rader å laste for tabell {table.name}")

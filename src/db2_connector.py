@@ -35,7 +35,11 @@ class DB2Connector:
 
         return rows
 
-    def get_rows_as_dataframe(self, query: str, binds: Dict[int, Any]) -> DataFrame:
+    def get_rows_as_dataframe(self, query: str, binds: Dict[int, Any] = None) -> DataFrame:
+
+        if not binds:
+            binds = {}
+
         rows = self.get_rows(query=query, binds=binds)
         return DataFrame(data=rows)
 

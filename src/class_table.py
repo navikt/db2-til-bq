@@ -38,33 +38,29 @@ class Table:
 
         return query
 
-    def make_bq_load_jobconfig(self, write_disposition: str) -> LoadJobConfig:
+    def make_bq_load_job_config(self, write_disposition: str) -> LoadJobConfig:
+
+        schema = self.cols
+        create_disposition = "CREATE_IF_NEEDED"
+
+        job_config = LoadJobConfig(schema=schema,
+                                   write_disposition=write_disposition,
+                                   create_disposition=create_disposition)
+
         if self.table_type == TableType.FAK:
-            job_config = LoadJobConfig(
-                schema=self.cols,
-                write_disposition=write_disposition,
-                create_disposition="CREATE_IF_NEEDED",
-                time_partitioning=table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
-                    type_="DAY",
-                    field="tidspkt_reg",  # TODO parametere for field
-                    expiration_ms=1000
-                    * 60
-                    * 60
-                    * 24
-                    * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
-                ),
-            )
-        else:  # dim
-            job_config = LoadJobConfig(
-                schema=self.cols,
-                write_disposition=write_disposition,
-                create_disposition="CREATE_IF_NEEDED",
-            )
+            job_config.time_partitioning = table.TimePartitioning(
+                type_="DAY",
+                field="tidspkt_reg",
+                expiration_ms=1000* 60* 60 * 24* 730)
+
 
         return job_config
 
     @staticmethod
-    def generate_binds(max_value_in_target=None) -> Dict[int, Any]:
-        binds = {1: max_value_in_target}
+    def generate_binds(from_datetime = None) -> Dict[int, Any]:
+        if from_datetime:
+            binds = {1: from_datetime}
+        else:
+            binds = {}
 
         return binds

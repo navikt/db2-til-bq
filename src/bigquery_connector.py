@@ -33,20 +33,8 @@ class BQConnector:
         return self._format_results(query_job=query_job)
 
     def put_dataframe(
-        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
-    ) -> None:
-        """
-        Laster opp en Dataframe til gitt tabell og write_disposition
+        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig) -> None:
 
-        Args:
-            df (DataFrame): Dataframen som skal lastes opp
-            table_id (str): Tabellen i BQ som skal skrives til
-            write_disposition (str): Enten "WRITE_APPEND" eller "WRITE_TRUNCATE"
-            table_type (str): Enten "fak" eller "dim"
-
-        Returns (None): Skriver ut resultater av jobben.
-
-        """
         job = self.client.load_table_from_dataframe(
             dataframe=df, destination=table_id, job_config=job_config
         )
@@ -79,42 +67,6 @@ class BQConnector:
 
         """
         return bigquery.Client()
-
-    @staticmethod
-    def _create_write_job_config(
-        write_disposition: str, table_type: str
-    ) -> bigquery.LoadJobConfig:
-        """
-        Lager en bigquery job config med gitt write disposition.
-        Args:
-            write_disposition (str): enten "WRITE_APPEND" eller "WRITE_TRUNCATE"
-
-        Returns (bigquery.LoadJobConfig): Config for å kjøre jobben
-
-        """
-        if table_type == "fak":
-            job_config = bigquery.LoadJobConfig(
-                autodetect=True,
-                write_disposition=write_disposition,
-                create_disposition="CREATE_IF_NEEDED",
-                time_partitioning=bigquery.table.TimePartitioning(  # sett opp måte å kun partisjonere tabellene som har data som det skal slettes for!!!!!!
-                    type_="DAY",
-                    field="tidspkt_reg",  # TODO parametere for field
-                    expiration_ms=1000
-                    * 60
-                    * 60
-                    * 24
-                    * 730,  # Data som er 730 dager = 2 år gammel slettes automatisk (som definert i behandlingen)
-                ),
-            )
-        else:  # dim
-            job_config = bigquery.LoadJobConfig(
-                autodetect=True,
-                write_disposition=write_disposition,
-                create_disposition="CREATE_IF_NEEDED",
-            )
-
-        return job_config
 
     @staticmethod
     def _format_results(query_job: bigquery.QueryJob) -> List[Dict[str, Any]]:
