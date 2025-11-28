@@ -4,49 +4,54 @@ from google.cloud.bigquery import SchemaField
 tables = [
     Table(
         name="t_vent_beregning",
+        description="Beregninger i Oppdragssystemet",
         table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
                 field_type="INTEGER",
-                description="Unik identifikator for en utført beregning i Oppdrag Z.",
+                description="Unik identifikator for beregninger i Oppdragssystemet.",
             ),
             SchemaField(
                 name="dato_beregnet",
                 field_type="DATE",
-                description="Datoen beregningen er utført.",
+                description="Datoen beregningen er utført i Oppdragssystemet.",
             ),
             SchemaField(
                 name="kode_faggruppe",
                 field_type="STRING",
-                description="Kode for gruppering av fagområder med felles egenskaper, f.eks. 'PEN' for pensjonsrelaterte ytelser",
+                description="Kode for faggruppe. En faggruppe består av flere fagområder hvor man ønsker en samlet felles skatt- og trekkberegning. F.eks. 'PEN' for pensjonsrelaterte ytelser",
             ),
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er satt inn i tabellen.",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",
     ),
     Table(
         name="t_vent_stoppnivaa",
+        description="""
+        Stoppnivå er et begrep i Oppdragssystemet som brukes for nedbryting av beregninger.
+        En beregning kan brytes ned i f.eks. perioder med tilhørende forfallsdato, gjelde forskjellige mottakere, eller kan gjelde ulike saker (f.eks sykepenger til én bruker, men gjelder flere forhold). 
+        Stoppnivå id sammen med beregnings id vil unikt identifisere et stoppnivå for en beregning""",
         table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
                 field_type="INTEGER",
-                description="Unik identifikator for en utført beregning i Oppdrag Z.",
+                description="Identifikator for beregninger i Oppdragssystemet.",
             ),
             SchemaField(
                 name="stoppnivaa_id",
                 field_type="INTEGER",
-                description="En beregning brytes ned i f.eks. perioder med tilhørende forfallsdato. Stoppnivå er et begrep i Oppdrag Z bruker for en slik nødvendig nebrytning. Stoppnivå id samt beregnings id unikt identifiserer et stoppnivå fra en beregning.",
+                description="Identifikator for stoppnivå i Oppdragssystemet. Stoppnivaa_id sammen med beregnings_id vil unikt identifisere et stoppnivå for en beregning. Ikke nødvendigvis inkrementelt med 1.",
             ),
             SchemaField(
                 name="oppdrags_id",
                 field_type="INTEGER",
-                description="Identifikator på utbetalingsoppdraget, unik identifikator som oppdrag Z oppretter når man mottar ett vedtak til utbetaling fra fagsystem.",
+                description="Identifikator på utbetalingsoppdraget, unik identifikator som Oppdragssystemet oppretter når man mottar ett vedtak til utbetaling fra fagsystem.",
             ),
             SchemaField(
                 name="fagsystem_id",
@@ -56,7 +61,7 @@ tables = [
             SchemaField(
                 name="type_skatt",
                 field_type="STRING",
-                description="Angir om det er beregnet skatt med prosenttrekk eller tabelltrekk. Med denne kan man oppdage feil hvis skattekort ikke har kunnet blitt innhentet (skjer ikke ofte, men har skjedd) ",
+                description="Angir om det er beregnet skatt med prosenttrekk eller tabelltrekk.",
             ),
             SchemaField(
                 name="kode_fagomraade",
@@ -66,71 +71,73 @@ tables = [
             SchemaField(
                 name="dato_periode_fom",
                 field_type="DATE",
-                description="Startsdatoen stoppnivået gjelder for. Sammen med dato_periode_tom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ",
+                description="Startdatoen stoppnivået gjelder for. Sammen med dato_periode_tom utgjør dette perioden stoppnivået gjelder for.",
             ),
             SchemaField(
                 name="dato_periode_tom",
                 field_type="DATE",
-                description="Sluttdatoen stoppnivået gjelder for. Sammen med dato_periode_fom er utgjør dette perioden det gjelder for. For statistikk og forventningsstyring av utbetalingsforløp ",
+                description="Sluttdatoen stoppnivået gjelder for. Sammen med dato_periode_fom utgjør dette perioden stoppnivået gjelder for.",
             ),
             SchemaField(
                 name="dato_forfall",
                 field_type="DATE",
-                description="Dato for når ytelse skal utbetales.",
+                description="Dato for når stoppnivået skal utbetales.",
             ),
             SchemaField(
                 name="dato_overfores",
                 field_type="DATE",
-                description="Antakeligvis når ytelse overføres til bank?",
+                description="Dato for når stoppnivået er planlagt overført til reskontro",
             ),
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er satt inn i tabellen.",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",
     ),
     Table(
         name="t_vent_stoppstatus",
+        description="Status for stoppnivå. Stoppstatus er synonymt med ventestatus",
         table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
                 field_type="INTEGER",
-                description="Unik identifikator for en utført beregning i Oppdrag Z.",
+                description="",
             ),
             SchemaField(
                 name="stoppnivaa_id",
                 field_type="INTEGER",
-                description="En beregning brytes ned i f.eks. perioder med tilhørende forfallsdato. Stoppnivå er et begrep i Oppdrag Z bruker for en slik nødvendig nebrytning. Stoppnivå id samt beregnings id unikt identifiserer et stoppnivå fra en beregning.",
+                description="",
             ),
             SchemaField(
                 name="kode_ventestatus",
                 field_type="STRING",
-                description="Identifikator for status på stoppnivået i venteregisteret, eks OVFO (for 'Overført til UR')",
+                description="Kode for status på stoppnivået, f.eks OVFO (for 'Overført til UR')",
             ),
             SchemaField(
                 name="lopenr",
                 field_type="INTEGER",
-                description="Tall som er >=1, hopper med steg += 1, 9999 markerer gjeldende ventestatus",
+                description="Løpenummer. Tall som er >=1, hopper med steg += 1, 9999 markerer gjeldende ventestatus",
             ),
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet ventestatusen er registert. Når siste statusrad settes til lopenr = 9999, så oppdateres også statusen på tidligere rad som hadde gjeldende ventestatus, men oppdaterer ikke tidspkt_reg for den tidligere gjeldende statusraden (i.e. tidspkt_reg har kun insert logikk).",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",
     ),
     Table(
         name="t_faggruppe",
+        description="Kodeverk for faggruppe. En faggruppe består av flere fagområder hvor man ønsker en samlet felles skatt- og trekkberegning. F.eks. pensjonsrelaterte ytelser",
         table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_faggruppe",
                 field_type="STRING",
-                description="Kode for gruppering av fagområder med felles egenskaper, f.eks. 'PEN' for pensjonsrelaterte ytelser",
+                description="Kode for faggruppe. F.eks. 'PEN' for pensjonsrelaterte ytelser",
             ),
             SchemaField(
                 name="navn_faggruppe",
@@ -140,19 +147,20 @@ tables = [
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er satt inn i tabellen.",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",
     ),
     Table(
         name="t_fagomraade",
+        description="Kodeverk for fagområde. Fagområde angir selve ytelsen, f.eks. arbeidsavklaringspenger",
         table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_fagomraade",
                 field_type="STRING",
-                description="En kode som angir selve ytelsen som beregningen gjeldre, f.eks. 'AAP' for arbeidsavklaringspenger",
+                description="Kode for fagområde. F.eks. 'AAP' for arbeidsavklaringspenger",
             ),
             SchemaField(
                 name="navn_fagomraade",
@@ -162,24 +170,25 @@ tables = [
             SchemaField(
                 name="kode_faggruppe",
                 field_type="STRING",
-                description="Kode for gruppering av fagområder med felles egenskaper, f.eks. 'PEN' for pensjonsrelaterte ytelser",
+                description="Kode for faggruppe, f.eks. 'ARBYT' for arbeidsrelaterte ytelser",
             ),
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er satt inn i tabellen.",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",
     ),
     Table(
         name="t_vent_statuskode",
+        description="Kodeverk for ventestatus/stoppstatus. En ventestatus angir statusen på et stoppnivå i Oppdragssystemet",
         table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_ventestatus",
                 field_type="STRING",
-                description="Identifikator for status på stoppnivået i venteregisteret, eks OVFO (for 'Overført til UR')",
+                description="Kode for ventestatus. F.eks OVFO (for 'Overført til UR')",
             ),
             SchemaField(
                 name="beskrivelse",
@@ -189,7 +198,7 @@ tables = [
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er satt inn i tabellen.",
+                description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
         check_col="tidspkt_reg",

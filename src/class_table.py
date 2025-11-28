@@ -15,6 +15,7 @@ class Table:
     """klasse for å lagre informasjon om kildetabellene våre"""
 
     name: str  # tabellnavn
+    description: str  # beskrivelse
     table_type: TableType  # type tabell, dim eller fak. Brukes for å styre lastemetode.
     cols: List[SchemaField]
     check_col: str = None  # kolonne vi sjekker for endringer ved deltalast
@@ -43,21 +44,24 @@ class Table:
         schema = self.cols
         create_disposition = "CREATE_IF_NEEDED"
 
-        job_config = LoadJobConfig(schema=schema,
-                                   write_disposition=write_disposition,
-                                   create_disposition=create_disposition)
+        job_config = LoadJobConfig(
+            schema=schema,
+            write_disposition=write_disposition,
+            create_disposition=create_disposition,
+            # destination_table_description=self.description,
+        )
 
         if self.table_type == TableType.FAK:
             job_config.time_partitioning = table.TimePartitioning(
                 type_="DAY",
                 field="tidspkt_reg",
-                expiration_ms=1000* 60* 60 * 24* 730)
-
+                expiration_ms=1000 * 60 * 60 * 24 * 730,
+            )
 
         return job_config
 
     @staticmethod
-    def generate_binds(from_datetime = None) -> Dict[int, Any]:
+    def generate_binds(from_datetime=None) -> Dict[int, Any]:
         if from_datetime:
             binds = {1: from_datetime}
         else:
