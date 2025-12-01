@@ -33,7 +33,8 @@ class BQConnector:
         return self._format_results(query_job=query_job)
 
     def put_dataframe(
-        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig) -> None:
+        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
+    ) -> None:
 
         job = self.client.load_table_from_dataframe(
             dataframe=df, destination=table_id, job_config=job_config
@@ -92,3 +93,13 @@ class BQConnector:
             print("Tabellen {} finnes ikke i BQ.".format(table_id))
 
         return table_exists_in_bq
+
+    def update_table_and_col_descriptions(self, table_id: str, desc: str, schema: List):
+        # oppdaterer description
+        bq_table = self.client.get_table(table_id)
+        bq_table.description = desc
+        self.client.update_table(bq_table, ["description"])
+
+        # oppdaterer schema
+        bq_table.schema = schema
+        self.client.update_table(bq_table, ["schema"])

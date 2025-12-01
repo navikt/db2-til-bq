@@ -98,18 +98,18 @@ tables = [
     ),
     Table(
         name="t_vent_stoppstatus",
-        description="Status for stoppnivå. Stoppstatus er synonymt med ventestatus",
+        description="Status for stoppnivå. Stoppstatus er synonymt med ventestatus.",
         table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
                 field_type="INTEGER",
-                description="",
+                description="Identifikator for beregninger i Oppdragssystemet.",
             ),
             SchemaField(
                 name="stoppnivaa_id",
                 field_type="INTEGER",
-                description="",
+                description="Identifikator for stoppnivå i Oppdragssystemet",
             ),
             SchemaField(
                 name="kode_ventestatus",

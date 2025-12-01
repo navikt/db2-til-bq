@@ -56,15 +56,18 @@ def db2_to_bq(table: Table, bq_client: BQConnector, db2_conn: DB2Connector):
 
     write_disposition = "WRITE_TRUNCATE"
 
-
     if table.table_type == TableType.DIM:
         query = table.build_sql_db2()
         df = db2_conn.get_rows_as_dataframe(query=query)
 
     elif table.table_type == TableType.FAK:
 
-        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id=table.bq_table_id)
-        from_datetime = get_from_datetime(bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq)
+        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(
+            table_id=table.bq_table_id
+        )
+        from_datetime = get_from_datetime(
+            bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq
+        )
         query = table.build_sql_db2()
         binds = table.generate_binds(from_datetime=from_datetime)
         df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
@@ -73,7 +76,9 @@ def db2_to_bq(table: Table, bq_client: BQConnector, db2_conn: DB2Connector):
             write_disposition = "WRITE_APPEND"
 
     else:
-        raise ValueError(f"Ukjent table_type {table.table_type} for tabell {table.name}.")
+        raise ValueError(
+            f"Ukjent table_type {table.table_type} for tabell {table.name}."
+        )
 
     if len(df) > 0:
         df.columns = df.columns.str.lower()
@@ -103,18 +108,16 @@ def main():
         db2_to_bq(table, bq_client, db2_conn)
 
 
-def db2_to_bq_pseudo():
-    # sjekker tabell type
-    # Hvis tabell type = "dim" -> full last
-    # Hvis tabell type = "fak" -> Må sette fra_dato
-    #   Hvis tabell finnes i BQ hentes fra_dato i BQ
-    #   Hvis ikke sette fra_data = i dag - minus 2 år
-    pass
+def update_desc():
+    from src.config_tables import tables
+
+    bq_client = BQConnector()
+    for table in tables:
+        bq_client.update_table_and_col_descriptions(
+            table_id=table.bq_table_id, desc=table.description, schema=table.cols
+        )
 
 
 if __name__ == "__main__":
     main()
-    # TODO:
-    # - Mer av logikken til klassen Tabel
-    # - Gjør om config tables til BQ Schema fields
-    # - Skrive tabellbeskrivelse til BQ
+    # update_desc() # Kjøres for å oppdatere tabell og kolonnekommentarer

@@ -22,6 +22,9 @@ Lokalt brukes OAuth:
 
 I nais-jobben har vi en egen servicebruker, `nais-job-srv`. Den har en egen nøkkel som ligger som nais secret, og blir hentet ut når nais-jobben kjører.
 
+### Oppdatere tabell-kommentarer i bigquery
+I filen `src/config_tables.py` ligger listen med tabeller og medfølgende beskrivelser og kolonnekommentarer. Når man oppdaterer disse må man også manuelt kjøre `update_desc()` i `main.py`
+
 ## db2 login
 
 Trenger en `.env` fil lokalt (filnavn lagt i `.gitignore`), som inneholder følgende (på følgende format, uten noen fnutter):
