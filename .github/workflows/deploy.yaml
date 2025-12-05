@@ -26,7 +26,13 @@ jobs:
         id: docker-build-push
         with:
           team: utsikt
-      - name: Deploy to Nais
+      - name: Deploy to PROD
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          ClUSTER: "prod-fss"
+          RESOURCE: .nais/job.yaml
+          WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
+      - name: Deploy to DEV
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "dev-fss"
