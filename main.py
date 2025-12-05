@@ -94,7 +94,9 @@ def db2_to_bq(table: Table, bq_client: BQConnector, db2_conn: DB2Connector):
 def main():
     from src.config_tables import tables
 
-    os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
+    if not os.environ.get("GOOGLE_CLOUD_PROJECT"):
+        os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
+
     bq_client = BQConnector()
     db2_conn = DB2Connector(
         database_name=os.environ["DATABASE_NAME"],
