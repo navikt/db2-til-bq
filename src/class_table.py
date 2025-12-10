@@ -66,7 +66,7 @@ class BaseTable(ABC):
 
     def _build_sql_db2(self) -> str:
         column_names: str = ",".join([col.name for col in self.cols])
-        query = f"""SELECT {column_names} FROM {self.db2_schema}.{self.name}"""
+        query = f"""SELECT {column_names} FROM {self.db2_schema}.{self.name} """
         return query
 
     @abstractmethod
