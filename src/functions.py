@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
+from typing import Union
 
 from src.bigquery_connector import BQConnector
-from src.class_table import Table
+from src.class_table import DimTable, FakTable
 
 
-def get_from_datetime(bq_client: BQConnector, table: Table, table_exists_in_bq: bool) -> datetime:
+def get_from_datetime(bq_client: BQConnector, table: Union[DimTable, FakTable], table_exists_in_bq: bool) -> datetime:
 
     if table_exists_in_bq:
         max_query = f"SELECT MAX({table.check_col}) FROM {table.bq_table_id}"

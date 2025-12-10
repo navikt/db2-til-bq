@@ -1,11 +1,10 @@
-from src.class_table import Table, TableType
+from src.class_table import FakTable, DimTable
 from google.cloud.bigquery import SchemaField
 
 tables = [
-    Table(
+    FakTable(
         name="t_vent_beregning",
         description="Beregninger i Oppdragssystemet",
-        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
@@ -30,13 +29,12 @@ tables = [
         ],
         check_col="tidspkt_reg",
     ),
-    Table(
+    FakTable(
         name="t_vent_stoppnivaa",
         description="""
         Stoppnivå er et begrep i Oppdragssystemet som brukes for nedbryting av beregninger.
         En beregning kan brytes ned i f.eks. perioder med tilhørende forfallsdato, gjelde forskjellige mottakere, eller kan gjelde ulike saker (f.eks sykepenger til én bruker, men gjelder flere forhold). 
         Stoppnivå id sammen med beregnings id vil unikt identifisere et stoppnivå for en beregning""",
-        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
@@ -96,10 +94,9 @@ tables = [
         ],
         check_col="tidspkt_reg",
     ),
-    Table(
+    FakTable(
         name="t_vent_stoppstatus",
         description="Status for stoppnivå. Stoppstatus er synonymt med ventestatus.",
-        table_type=TableType.FAK,
         cols=[
             SchemaField(
                 name="beregnings_id",
@@ -129,10 +126,9 @@ tables = [
         ],
         check_col="tidspkt_reg",
     ),
-    Table(
+    DimTable(
         name="t_faggruppe",
         description="Kodeverk for faggruppe. En faggruppe består av flere fagområder hvor man ønsker en samlet felles skatt- og trekkberegning. F.eks. pensjonsrelaterte ytelser",
-        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_faggruppe",
@@ -148,14 +144,11 @@ tables = [
                 name="tidspkt_reg",
                 field_type="DATETIME",
                 description="Tidspunktet for når raden er lastet inn i tabellen.",
-            ),
-        ],
-        check_col="tidspkt_reg",
-    ),
-    Table(
+            )
+        ]),
+    DimTable(
         name="t_fagomraade",
         description="Kodeverk for fagområde. Fagområde angir selve ytelsen, f.eks. arbeidsavklaringspenger",
-        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_fagomraade",
@@ -178,12 +171,10 @@ tables = [
                 description="Tidspunktet for når raden er lastet inn i tabellen.",
             ),
         ],
-        check_col="tidspkt_reg",
     ),
-    Table(
+    DimTable(
         name="t_vent_statuskode",
         description="Kodeverk for ventestatus/stoppstatus. En ventestatus angir statusen på et stoppnivå i Oppdragssystemet",
-        table_type=TableType.DIM,
         cols=[
             SchemaField(
                 name="kode_ventestatus",
@@ -198,17 +189,7 @@ tables = [
             SchemaField(
                 name="tidspkt_reg",
                 field_type="DATETIME",
-                description="Tidspunktet for når raden er lastet inn i tabellen.",
-            ),
-        ],
-        check_col="tidspkt_reg",
-    ),
+                description="Tidspunktet for når raden er lastet inn i tabellen."
+            )
+        ])
 ]
-
-if __name__ == "__main__":
-    schema = "OS231Q2"
-
-    for table in tables:
-        print(table.name)
-
-        print(table.build_sql(schema=schema, load_method="delta"))
