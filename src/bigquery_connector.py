@@ -87,11 +87,8 @@ class BQConnector:
         try:
             self.client.get_table(table_id)  # Make an API request.
             table_exists_in_bq = True
-            print("Tabellen {} finnes i BQ.".format(table_id))
         except NotFound:
             table_exists_in_bq = False
-            print("Tabellen {} finnes ikke i BQ.".format(table_id))
-
         return table_exists_in_bq
 
     def update_table_and_col_descriptions(self, table_id: str, desc: str, schema: List):
