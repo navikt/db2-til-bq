@@ -52,20 +52,28 @@ if not local:
     copy_db2_license()
 
 
-def db2_to_bq(table: Union[DimTable, FakTable], bq_client: BQConnector, db2_conn: DB2Connector, logger: Logger):
-    logger.info(f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}")
-
+def db2_to_bq(
+    table: Union[DimTable, FakTable],
+    bq_client: BQConnector,
+    db2_conn: DB2Connector,
+    logger: Logger,
+):
+    logger.info(
+        f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}"
+    )
 
     if table.table_type == TableType.FAK:
-        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(table_id=table.bq_table_id)
+        table_exists_in_bq = bq_client.check_if_table_exists_in_bq(
+            table_id=table.bq_table_id
+        )
         logger.info(f"{table.name.upper()} exists: {table_exists_in_bq}")
-        table.from_datetime = get_from_datetime(bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq)
-
+        table.from_datetime = get_from_datetime(
+            bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq
+        )
 
     query = table.build_sql_db2()
     binds = table.generate_binds()
     df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
-
 
     if len(df) > 0:
         df.columns = df.columns.str.lower()
@@ -75,11 +83,8 @@ def db2_to_bq(table: Union[DimTable, FakTable], bq_client: BQConnector, db2_conn
     logger.info(f"{len(df)} rows was written to {table.name.upper()}")
 
 
-
 def main():
     from src.config_tables import tables
-
-    logger = Logger(name="DB2-til-BQ")
 
     if not os.environ.get("GOOGLE_CLOUD_PROJECT"):
         os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
@@ -100,13 +105,19 @@ def main():
 def update_desc():
     from src.config_tables import tables
 
+    logger.info("oppdater")
+
     bq_client = BQConnector()
     for table in tables:
         bq_client.update_table_and_col_descriptions(
-            table_id=table.bq_table_id, desc=table.description, schema=table.cols
+            table_id=table.bq_table_id,
+            desc=table.description,
+            schema=table.cols,
+            logger=logger,
         )
 
 
 if __name__ == "__main__":
+    logger = Logger(name="DB2-til-BQ")
     main()
-    # update_desc() # Kjøres for å oppdatere tabell og kolonnekommentarer
+    # update_desc()  # Kjøres for å oppdatere tabell og kolonnekommentarer

@@ -2,6 +2,7 @@ from typing import List, Dict, Any
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 from pandas import DataFrame
+from src.logger import Logger
 
 
 class BQConnector:
@@ -35,7 +36,6 @@ class BQConnector:
     def put_dataframe(
         self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
     ) -> None:
-
         job = self.client.load_table_from_dataframe(
             dataframe=df, destination=table_id, job_config=job_config
         )
@@ -91,11 +91,19 @@ class BQConnector:
             table_exists_in_bq = False
         return table_exists_in_bq
 
-    def update_table_and_col_descriptions(self, table_id: str, desc: str, schema: List):
-        # oppdaterer description
+    def update_table_and_col_descriptions(
+        self, table_id: str, desc: str, schema: List, logger: Logger
+    ):
+        logger.info(f"Sjekker tabell {table_id} for oppdateringer")
+
         bq_table = self.client.get_table(table_id)
-        bq_table.description = desc
-        self.client.update_table(bq_table, ["description"])
+
+        # oppdaterer description
+        original_desc = bq_table.description
+        if desc != original_desc:
+            logger.info(f"Oppdaterer beskrivelse for tabell {table_id}")
+            bq_table.description = desc
+            self.client.update_table(bq_table, ["description"])
 
         # oppdaterer schema
         bq_table.schema = schema
