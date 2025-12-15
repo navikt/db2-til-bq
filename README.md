@@ -43,4 +43,4 @@ Må også legge til IBM db2 lisensfil for Python her `.venv/lib/python3.13/site-
 Obs! nais-jobben bruker versjon 11, mens lokalt (med nye Mac'er) brukes versjon 12. Begge er lagret som nais secrets.
 
 ## Formattering
-Bruker Black formatter til formattering av kode.
+Vi bruker [Ruff](https://docs.astral.sh/ruff/tutorial/) til formattering av kode.
