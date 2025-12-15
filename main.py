@@ -105,7 +105,7 @@ def main():
 def update_desc():
     from src.config_tables import tables
 
-    logger.info("oppdater")
+    logger.info("Oppdater beskrivelse og schema i alle BigQuery-tabellene")
 
     bq_client = BQConnector()
     for table in tables:

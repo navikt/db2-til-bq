@@ -98,13 +98,13 @@ class BQConnector:
 
         bq_table = self.client.get_table(table_id)
 
-        # oppdaterer description
+        # oppdaterer tabellen
         original_desc = bq_table.description
-        if desc != original_desc:
-            logger.info(f"Oppdaterer beskrivelse for tabell {table_id}")
+        original_schema = bq_table.schema
+        if (desc != original_desc) or (schema != original_schema):
+            logger.info(
+                f"Oppdaterer beskrivelse og /eller schema for tabell {table_id}"
+            )
             bq_table.description = desc
-            self.client.update_table(bq_table, ["description"])
-
-        # oppdaterer schema
-        bq_table.schema = schema
-        self.client.update_table(bq_table, ["schema"])
+            bq_table.schema = schema
+            self.client.update_table(bq_table, ["description", "schema"])
