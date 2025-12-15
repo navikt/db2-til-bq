@@ -1,8 +1,11 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
+
 from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
+from google.api_core.exceptions import BadRequest
 from pandas import DataFrame
 from src.logger import Logger
+from src.exceptions import BigQueryErrors
 
 
 class BQConnector:
@@ -40,7 +43,13 @@ class BQConnector:
             dataframe=df, destination=table_id, job_config=job_config
         )
 
-        job.result()
+        try:
+            job.result()
+        except BadRequest:
+            bq_errors = BigQueryErrors(errors=job.errors)
+            for exception in bq_errors:
+                raise exception
+
 
     def get_rows_as_dataframe(self, query: str) -> DataFrame:
         """
