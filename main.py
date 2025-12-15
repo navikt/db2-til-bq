@@ -40,8 +40,6 @@ else:
 
 
 def check_envs():
-    # Hvis den ikke finner variabler i miljøet
-    # prøv å laster fra .env
     pass
 
 
