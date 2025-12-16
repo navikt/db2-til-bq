@@ -3,9 +3,9 @@ import os
 import shutil
 from pathlib import Path
 from typing import Union
+
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
-
 from src.functions import get_from_datetime
 from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
@@ -53,8 +53,7 @@ if not local:
 def db2_to_bq(
     table: Union[DimTable, FakTable],
     bq_client: BQConnector,
-    db2_conn: DB2Connector,
-    logger: Logger,
+    db2_conn: DB2Connector
 ):
     logger.info(
         f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}"
@@ -110,6 +109,6 @@ def update_desc():
 
 
 if __name__ == "__main__":
-    logger = Logger(name="DB2-til-BQ")
+    logger = Logger(name="db2-til-bq")
     main()
-    # update_desc()  # Kjøres for å oppdatere tabell og kolonnekommentarer
+    #update_desc()  # Kjøres for å oppdatere tabell og kolonnekommentarer
