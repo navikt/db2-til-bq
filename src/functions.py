@@ -3,6 +3,7 @@ from typing import Union
 
 from src.bigquery_connector import BQConnector
 from src.class_table import DimTable, FakTable
+from src.logger import Logger
 
 
 def get_from_datetime(bq_client: BQConnector, table: Union[DimTable, FakTable], table_exists_in_bq: bool) -> datetime:
@@ -16,6 +17,16 @@ def get_from_datetime(bq_client: BQConnector, table: Union[DimTable, FakTable], 
 
 
     return from_date
+
+def delete_table(table: Union[DimTable, FakTable], bq_client: BQConnector, logger: Logger) -> None:
+    table_name = table.bq_table_id
+    table_dataset = table.bq_dataset
+    bq_client.delete_table(table_name=table_name, dataset=table_dataset, logger=logger)
+
+
+def create_datasets(datasets: list[str], bq_connector: BQConnector, logger:Logger) -> None:
+    for dataset in datasets:
+        bq_connector.create_dataset(dataset, logger=logger)
 
 
 if __name__ == "__main__":

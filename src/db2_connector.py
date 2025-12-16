@@ -1,3 +1,4 @@
+import os
 import ibm_db
 
 from typing import List, Dict, Any
@@ -48,6 +49,7 @@ class DB2Connector:
         connection = ibm_db.connect(dsn, "", "")
         return connection
 
+
     def _create_dsn(self):
         dsn = (
             f"DRIVER={{IBM DB2 ODBC DRIVER}};"
@@ -60,3 +62,13 @@ class DB2Connector:
         )
 
         return dsn
+
+    @staticmethod
+    def create_connector_from_envs() -> "DB2Connector":
+        database_name = os.environ["DATABASE_NAME"]
+        username = os.environ["DATABASE_USERNAME"]
+        password = os.environ["DATABASE_PASSWORD"]
+        port = os.environ["DATABASE_PORT"]
+        host = os.environ["DATABASE_HOST"]
+
+        return DB2Connector(database_name=database_name, host=host, port=port, username=username, password=password)

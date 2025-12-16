@@ -88,13 +88,7 @@ def main():
         os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
 
     bq_client = BQConnector()
-    db2_conn = DB2Connector(
-        database_name=os.environ["DATABASE_NAME"],
-        username=os.environ["DATABASE_USERNAME"],
-        password=os.environ["DATABASE_PASSWORD"],
-        port=os.environ["DATABASE_PORT"],
-        host=os.environ["DATABASE_HOST"],
-    )
+    db2_conn = DB2Connector.create_connector_from_envs()
 
     for table in tables:
         db2_to_bq(table=table, bq_client=bq_client, db2_conn=db2_conn, logger=logger)

@@ -82,6 +82,27 @@ class BQConnector:
         results = query_job.result()
         return [{key: value for key, value in row.items()} for row in results]
 
+    def create_dataset(self, dataset_name: str,
+                       logger: Logger,
+                       description: str = None,
+                       location: str = "europe-north1") -> None:
+
+        dataset = bigquery.Dataset(dataset_ref=dataset_name)
+        dataset.location = location
+
+        if description:
+            dataset.description = description
+
+        logger.info(f"Creating dataset {dataset_name} in {dataset.project} in {dataset.location}")
+        self.client.create_dataset(dataset)
+
+    def delete_table(self, table_name: str, dataset: str,  logger: Logger)->None:
+        project_id = self.client.project
+        table_id = f"{project_id}.{dataset}.{table_name}"
+        logger.info(f"Deleting table {table_id} in {dataset} in {project_id}")
+        self.client.delete_table(table_id)
+
+
     def check_if_table_exists_in_bq(self, table_id: str) -> bool:
         # Check if table exists in BQ, and set appropriate load method.
         try:
