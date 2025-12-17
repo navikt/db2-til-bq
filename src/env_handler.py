@@ -17,7 +17,9 @@ class EnvHandler:
     def __post_init__(self) -> None:
         self.required_envs = self._get_required_envs()
         self.local = self._set_local()
+        self._copy_db2_license()
         self._set_gcp_project_id()
+
 
     def __iter__(self):
         for required_env in self.required_envs:
@@ -44,7 +46,7 @@ class EnvHandler:
             os.environ["GOOGLE_CLOUD_PROJECT"] =self.gcp_project_id
 
     def _copy_db2_license(self):
-        if self.local:
+        if not self.local:
             license_source = Path("/var/run/secrets/db2-license/db2consv_zs.lic")
             license_destination = Path("/app/venv/lib/python3.13/site-packages/clidriver/license/db2consv_zs.lic" )
 
