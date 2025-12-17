@@ -7,8 +7,8 @@ from src.logger import Logger
 from src.env_handler import EnvHandler
 
 
-def set_and_check_envs(gcp_project_id: str) -> None:
-    env_handler: EnvHandler = EnvHandler(gcp_project_id=gcp_project_id)
+def set_and_check_envs() -> None:
+    env_handler = EnvHandler()
     env_handler.load_envs()
     env_handler.check_envs()
 

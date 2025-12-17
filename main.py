@@ -40,7 +40,7 @@ def db2_to_bq(
 
 
 def main(logger: Logger):
-    set_and_check_envs(gcp_project_id="utsikt-dev-3609")
+    set_and_check_envs()
 
     from src.config_tables import tables
 

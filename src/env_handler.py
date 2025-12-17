@@ -10,7 +10,6 @@ from src.exceptions import EnvsNotSetError, Db2LicenseNotFoundError
 
 @dataclass
 class EnvHandler:
-    gcp_project_id: str
     required_envs: list[str] = field(init=False)
     local: bool = field(init=False)
 
@@ -18,8 +17,6 @@ class EnvHandler:
         self.required_envs = self._get_required_envs()
         self.local = self._set_local()
         self._copy_db2_license()
-        self._set_gcp_project_id()
-
 
     def __iter__(self):
         for required_env in self.required_envs:
@@ -41,10 +38,6 @@ class EnvHandler:
         if missing_envs:
             raise EnvsNotSetError(message=f"Missing required environment variables: {missing_envs}")
 
-    def _set_gcp_project_id(self) -> None:
-        if self.local:
-            os.environ["GOOGLE_CLOUD_PROJECT"] =self.gcp_project_id
-
     def _copy_db2_license(self):
         if not self.local:
             license_source = Path("/var/run/secrets/db2-license/db2consv_zs.lic")
@@ -54,7 +47,7 @@ class EnvHandler:
                 resolved_source = license_source.resolve()
                 shutil.copy2(resolved_source, license_destination)
             else:
-                raise Db2LicenseNotFoundError(f" license not found at {license_source}")
+                raise Db2LicenseNotFoundError(f"Db2 license not found at {license_source}")
 
     @staticmethod
     def _get_required_envs() -> list[str]:
