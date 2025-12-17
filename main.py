@@ -53,7 +53,8 @@ if not local:
 def db2_to_bq(
     table: Union[DimTable, FakTable],
     bq_client: BQConnector,
-    db2_conn: DB2Connector
+    db2_conn: DB2Connector,
+    logger: Logger,
 ):
     logger.info(
         f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}"
@@ -80,11 +81,13 @@ def db2_to_bq(
     logger.info(f"{len(df)} rows was written to {table.name.upper()}")
 
 
-def main():
+def main(logger: Logger):
     from src.config_tables import tables
 
     if not os.environ.get("GOOGLE_CLOUD_PROJECT"):
-        os.environ["GOOGLE_CLOUD_PROJECT"] = "utsikt-dev-3609"  # bør flyttes til .env
+        os.environ["GOOGLE_CLOUD_PROJECT"] = (
+            "utsikt-dev-3609"  # bør flyttes til .env utsikt-prod-2dfe
+        )
 
     bq_client = BQConnector()
     db2_conn = DB2Connector.create_connector_from_envs()
@@ -93,7 +96,7 @@ def main():
         db2_to_bq(table=table, bq_client=bq_client, db2_conn=db2_conn, logger=logger)
 
 
-def update_desc():
+def update_desc(logger: Logger):
     from src.config_tables import tables
 
     logger.info("Oppdater beskrivelse og schema i alle BigQuery-tabellene")
@@ -110,5 +113,5 @@ def update_desc():
 
 if __name__ == "__main__":
     logger = Logger(name="db2-til-bq")
-    main()
-    #update_desc()  # Kjøres for å oppdatere tabell og kolonnekommentarer
+    # main(logger=logger)
+    update_desc(logger=logger)  # Kjøres for å oppdatere tabell og kolonnekommentarer
