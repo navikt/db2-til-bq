@@ -1,53 +1,11 @@
 #!/usr/bin/env python3
-import os
-import shutil
-from pathlib import Path
 from typing import Union
 
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
-from src.functions import get_from_datetime
+from src.functions import get_from_datetime, set_and_check_envs
 from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
-
-
-def copy_db2_license():
-    """Copy DB2 license file to the appropriate location if it exists."""
-    license_source = Path("/var/run/secrets/db2-license/db2consv_zs.lic")
-    license_destination = Path(
-        "/app/venv/lib/python3.13/site-packages/clidriver/license/db2consv_zs.lic"
-    )
-
-    if license_source.exists():
-        try:
-            # Resolve any symlinks and copy the actual file
-            resolved_source = license_source.resolve()
-            shutil.copy2(resolved_source, license_destination)
-            print(f"DB2 license copied from {resolved_source} to {license_destination}")
-        except Exception as e:
-            print(f"Warning: Failed to copy DB2 license file: {e}")
-    else:
-        print("DB2 license file not found, skipping copy")
-
-
-if "NAIS_CLUSTER_NAME" in os.environ:
-    local = False
-else:
-    local = True
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
-
-def check_envs():
-    pass
-
-
-print(f"utvikler lokalt: {local}")
-
-# Copy DB2 license when not running locally
-if not local:
-    copy_db2_license()
 
 
 def db2_to_bq(
@@ -82,12 +40,9 @@ def db2_to_bq(
 
 
 def main(logger: Logger):
-    from src.config_tables import tables
+    set_and_check_envs(gcp_project_id="utsikt-dev-3609")
 
-    if not os.environ.get("GOOGLE_CLOUD_PROJECT"):
-        os.environ["GOOGLE_CLOUD_PROJECT"] = (
-            "utsikt-dev-3609"  # bør flyttes til .env utsikt-prod-2dfe
-        )
+    from src.config_tables import tables
 
     bq_client = BQConnector()
     db2_conn = DB2Connector.create_connector_from_envs()
@@ -112,6 +67,6 @@ def update_desc(logger: Logger):
 
 
 if __name__ == "__main__":
-    logger = Logger(name="db2-til-bq")
-    # main(logger=logger)
-    update_desc(logger=logger)  # Kjøres for å oppdatere tabell og kolonnekommentarer
+    logs  = Logger(name="db2-til-bq")
+    main(logger=logs)
+    #update_desc(logger=logs)  # Kjøres for å oppdatere tabell og kolonnekommentarer
