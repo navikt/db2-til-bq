@@ -1,5 +1,15 @@
 from typing import Any, Union
 
+
+class EnvsNotSetError(BaseException):
+     def __init__(self, message: str) -> None:
+         super().__init__(message)
+
+class Db2LicenseNotFoundError(BaseException):
+    def __init__(self, message: str) -> None:
+        super().__init__(message)
+
+
 class BigQueryError(BaseException):
     def __init__(self, message: str) -> None:
         super().__init__(message)

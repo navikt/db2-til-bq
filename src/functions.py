@@ -4,6 +4,13 @@ from typing import Union
 from src.bigquery_connector import BQConnector
 from src.class_table import DimTable, FakTable
 from src.logger import Logger
+from src.env_handler import EnvHandler
+
+
+def set_and_check_envs() -> None:
+    env_handler = EnvHandler()
+    env_handler.load_envs()
+    env_handler.check_envs()
 
 
 def get_from_datetime(bq_client: BQConnector, table: Union[DimTable, FakTable], table_exists_in_bq: bool) -> datetime:
