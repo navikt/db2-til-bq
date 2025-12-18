@@ -18,7 +18,7 @@ class YamlValueError(BaseException):
         super().__init__(message)
 
 
-class Types(Enum):
+class DataTypes(Enum):
     """
     Enum class to represent allowed field types
     """
@@ -122,9 +122,9 @@ class FieldModel(BaseModel):
             raise YamlValueError(error_message)
 
     def _verify_field_type(self):
-        if self.field_type.upper() not in FieldTypes:
+        if self.field_type.upper() not in DataTypes:
             error_message = (f"{self.name}.field_type: must be one of the following values:"
-                             f" {[field_type.value for field_type in FieldTypes]}."
+                             f" {[field_type.value for field_type in DataTypes]}."
                              f" Got {self.field_type.upper()}.")
 
             raise YamlValueError(error_message)
