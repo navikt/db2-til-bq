@@ -13,6 +13,7 @@ dependencies = [
     "ibm-db-sa>=0.4.1",
     "pandas>=2.3.0",
     "pandas-gbq>=0.29.2",
+    "pyyaml>= 6.0.3"
 ]
 
 [tool.ruff]
