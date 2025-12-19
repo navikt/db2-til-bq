@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 from typing_extensions import Self
 from pprint import pprint
 
@@ -54,6 +54,15 @@ class ColumnModel(BaseModel):
     mode: Optional[str] = None
     max_length: Optional[int] = Field(default=None, gt=0)
 
+    def to_bq_schema_field(self) -> bigquery.SchemaField:
+        return bigquery.SchemaField(
+            name=self.name,
+            field_type=self.col_data_type,
+            description=self.description,
+            mode=self.mode,
+            max_length=self.max_length,
+        )
+
     @staticmethod
     def from_dict(col_dict: dict) -> "ColumnModel":
         name = col_dict.get("name")
@@ -99,6 +108,23 @@ class TableModel(BaseModel):
     description: str
     cols: list[ColumnModel]
     check_col: Optional[str] = None
+
+    def to_table_object(self) -> Union[DimTable, FakTable]:
+        cols = [col.to_bq_schema_field() for col in self.cols]
+
+        if self.table_type.upper() == TableTypes.DIM.value:
+            return DimTable(
+                name=self.name,
+                description=self.description,
+                cols=cols,
+            )
+        else:
+            return FakTable(
+                name=self.name,
+                description=self.description,
+                cols=cols,
+                check_col=self.check_col,
+            )
 
     @staticmethod
     def from_dict(table_dict: dict) -> "TableModel":
