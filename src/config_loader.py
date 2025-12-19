@@ -1,15 +1,14 @@
 from typing import Optional, Union
 from typing_extensions import Self
-from pprint import pprint
-
-# from dataclasses import dataclass, field, fields
 from enum import Enum
 
 from google.cloud import bigquery
-from yaml import safe_load
 from pydantic import BaseModel, field_validator, Field, model_validator
 
 from src.class_table import DimTable, FakTable
+
+# TODO feilrapportering på hvilken tabell og hvilken kolonne som ev. er feil i .yaml fila
+# TODO vurder å splitte opp fila da den er lang
 
 
 class YamlValueError(BaseException):
@@ -181,12 +180,3 @@ class TableModel(BaseModel):
             if self.check_col:
                 raise YamlValueError("Don't set 'check_col' for DIM tables.")
         return self
-
-
-if __name__ == "__main__":
-    with open("config_tables.yaml", "r") as file:
-        tables = safe_load(file)
-
-    table_models = []
-    for table in tables["tables"]:
-        table_models.append(TableModel.from_dict(table))

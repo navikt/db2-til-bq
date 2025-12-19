@@ -3,7 +3,7 @@ from typing import Union
 
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
-from src.functions import get_from_datetime, set_and_check_envs
+from src.functions import get_from_datetime, set_and_check_envs, load_config_tables
 from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
 
@@ -42,7 +42,7 @@ def db2_to_bq(
 def main(logger: Logger):
     set_and_check_envs()
 
-    from src.config_tables import tables
+    tables = load_config_tables()
 
     bq_client = BQConnector()
     db2_conn = DB2Connector.create_connector_from_envs()
@@ -67,6 +67,6 @@ def update_desc(logger: Logger):
 
 
 if __name__ == "__main__":
-    logs  = Logger(name="db2-til-bq")
+    logs = Logger(name="db2-til-bq")
     main(logger=logs)
-    #update_desc(logger=logs)  # Kjøres for å oppdatere tabell og kolonnekommentarer
+    # update_desc(logger=logs)  # Kjøres for å oppdatere tabell og kolonnekommentarer

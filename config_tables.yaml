@@ -1,28 +1,4 @@
 tables:
-- name: t_vent_beregning
-  table_type: fak
-  description: Beregninger i Oppdragssystemet
-  check_col: tidspkt_reg
-  cols:
-    - name: beregnings_id
-      col_data_type: integer
-      description: Unik identifikator for beregninger i Oppdragssystemet
-      mode: required
-
-    - name: dato_beregnet
-      col_data_type: date
-      description: Datoen beregningen er utført i Oppdragssystemet.
-
-    - name: kode_faggruppe
-      col_data_type: string
-      description: Kode for faggruppe. En faggruppe består av flere fagområder hvor man ønsker en samlet felles skatt- og trekkberegning. F.eks. 'PEN' for pensjonsrelaterte ytelse
-      max_length: 8
-      
-    - name: tidspkt_reg
-      col_data_type: datetime
-      description: Tidspunktet for når raden er lastet inn i tabellen.
-
-
 - name: t_faggruppe
   table_type: dim
   description: Kodeverk for faggruppe. En faggruppe består av flere fagområder hvor man ønsker en samlet felles skatt-og trekkberegning. F.eks. pensjonsrelaterte ytelser
