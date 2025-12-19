@@ -1,13 +1,13 @@
-import types
-from typing import Union, Optional
+from typing import Optional
 from typing_extensions import Self
+from pprint import pprint
 
 # from dataclasses import dataclass, field, fields
 from enum import Enum
 
 from google.cloud import bigquery
 from yaml import safe_load
-from pydantic import BaseModel, field_validator, Field, InstanceOf, model_validator
+from pydantic import BaseModel, field_validator, Field, model_validator
 
 from src.class_table import DimTable, FakTable
 
@@ -54,6 +54,22 @@ class ColumnModel(BaseModel):
     mode: Optional[str] = None
     max_length: Optional[int] = Field(default=None, gt=0)
 
+    @staticmethod
+    def from_dict(col_dict: dict) -> "ColumnModel":
+        name = col_dict.get("name")
+        col_data_type = col_dict.get("col_data_type")
+        description = col_dict.get("description")
+        mode = col_dict.get("mode")
+        max_length = col_dict.get("max_length")
+
+        return ColumnModel(
+            name=name,
+            col_data_type=col_data_type,
+            description=description,
+            mode=mode,
+            max_length=max_length,
+        )
+
     @field_validator("col_data_type")
     @classmethod
     def validate_col_data_type(cls, col_data_type: str) -> str:
@@ -84,6 +100,22 @@ class TableModel(BaseModel):
     cols: list[ColumnModel]
     check_col: Optional[str] = None
 
+    @staticmethod
+    def from_dict(table_dict: dict) -> "TableModel":
+        name = table_dict.get("name")
+        table_type = table_dict.get("table_type")
+        description = table_dict.get("description")
+        cols = [ColumnModel.from_dict(col) for col in table_dict.get("cols")]
+        check_col = table_dict.get("check_col")
+
+        return TableModel(
+            name=name,
+            table_type=table_type,
+            description=description,
+            cols=cols,
+            check_col=check_col,
+        )
+
     @field_validator("table_type")
     @classmethod
     def validate_table_type(cls, table_type: str) -> str:
@@ -104,6 +136,7 @@ class TableModel(BaseModel):
 
     @model_validator(mode="after")
     def validate_check_col(self) -> Self:
+        # TODO: forenkle if (fordi det ser mye ut)
         # sjekk at er FAK
         if self.table_type.upper() == TableTypes.FAK.value:
             # sjekk at check_col er satt (gitt at det er FAK)
@@ -112,7 +145,6 @@ class TableModel(BaseModel):
 
             # sjekk at check_col er en av kolonnenavnene
             if self.check_col not in [col.name for col in self.cols]:
-                print("enssne")
                 raise YamlValueError(
                     f"'check_col' must be one of the column names defined in 'cols'."
                     f" Got '{self.check_col}'."
@@ -126,21 +158,9 @@ class TableModel(BaseModel):
 
 
 if __name__ == "__main__":
-    test_col = ColumnModel(
-        name="fsdklml",
-        col_data_type="integer",
-        description="This is a test column",
-        mode=None,
-        max_length=None,
-    )
-
-    test_table = TableModel(
-        name="test_table",
-        table_type="FAK",
-        description="This is a test table",
-        cols=["sdns"],
-        check_col="fsmdl",
-    )
-
     with open("config_tables.yaml", "r") as file:
         tables = safe_load(file)
+
+    table_models = []
+    for table in tables["tables"]:
+        table_models.append(TableModel.from_dict(table))
