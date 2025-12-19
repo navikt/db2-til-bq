@@ -81,7 +81,7 @@ class TableModel(BaseModel):
     name: str
     table_type: str
     description: str
-    cols: list[InstanceOf[ColumnModel]]
+    cols: list[ColumnModel]
     check_col: Optional[str] = None
 
     @field_validator("table_type")
@@ -94,6 +94,13 @@ class TableModel(BaseModel):
                 f"Got '{table_type}'. (not case sensitive)"
             )
         return table_type
+
+    @field_validator("cols")
+    @classmethod
+    def validate_cols(cls, cols: list[ColumnModel]) -> list[ColumnModel]:
+        if not cols or len(cols) == 0:
+            raise YamlValueError("'cols' must have at least one column defined.")
+        return cols
 
     @model_validator(mode="after")
     def validate_check_col(self) -> Self:
@@ -131,7 +138,7 @@ if __name__ == "__main__":
         name="test_table",
         table_type="FAK",
         description="This is a test table",
-        cols=[test_col],
+        cols=["sdns"],
         check_col="fsmdl",
     )
 
