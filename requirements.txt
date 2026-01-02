@@ -6,5 +6,6 @@ ibm-db-sa>=0.4.1
 ibm-db>=3.2.6
 pandas-gbq>=0.29.2
 pandas>=2.3.0
-PyYAML>= 6.0.3
+pydantic>= 2.12.5
 python-dotenv>=1.1.1
+pyyaml>= 6.0.3
