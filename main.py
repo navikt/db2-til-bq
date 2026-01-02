@@ -52,7 +52,9 @@ def main(logger: Logger):
 
 
 def update_desc(logger: Logger):
-    from src.config_tables import tables
+    set_and_check_envs()
+
+    tables = load_config_tables()
 
     logger.info("Oppdater beskrivelse og schema i alle BigQuery-tabellene")
 
