@@ -31,5 +31,6 @@ WORKDIR /app
 
 COPY main.py .
 COPY src ./src
+COPY config_tables.yaml .
 
 ENTRYPOINT [ "/app/venv/bin/python", "main.py" ]
