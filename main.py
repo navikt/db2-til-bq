@@ -29,14 +29,18 @@ def db2_to_bq(
 
     query = table.build_sql_db2()
     binds = table.generate_binds()
-    df = db2_conn.get_rows_as_dataframe(query=query, binds=binds)
 
-    if len(df) > 0:
-        df.columns = df.columns.str.lower()
-        job_config = table.make_bq_load_job_config()
-        bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
+    total_number_rows = 0
+    for df in db2_conn.get_chunks(query=query, binds=binds, chunk_size=100000):
+        if len(df) > 0:
+            df.columns = df.columns.str.lower()
+            job_config = table.make_bq_load_job_config()
+            bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
+            total_number_rows += len(df)
 
-    logger.info(f"{len(df)} rows was written to {table.name.upper()}")
+        logger.info(f"Chunk of size {len(df)} was written to {table.name.upper()}")
+
+    logger.info(f"Total number of rows written to {table.name.upper()} was {total_number_rows}")
 
 
 def main(logger: Logger):
