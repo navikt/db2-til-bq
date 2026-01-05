@@ -1,7 +1,7 @@
 import os
 import ibm_db
 
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Iterator
 from pandas import DataFrame
 
 
@@ -14,6 +14,32 @@ class DB2Connector:
         self._username = username
         self._password = password
         self.connection: ibm_db.IBM_DBConnection = self._create_connection()
+
+
+    def get_chunks(self, query: str, chunk_size: int = 10000, binds: Dict[int, Any] = None)-> Iterator[DataFrame]:
+        statement = ibm_db.prepare(self.connection, query)
+
+        for _index, value in binds.items():
+            ibm_db.bind_param(statement, _index, value)
+
+        ibm_db.execute(statement)
+
+        done = False
+
+        current_row: Dict[str, Any] = ibm_db.fetch_assoc(statement)
+
+        while not done:
+            current_chunk  = []
+            for _ in range(chunk_size):
+                if current_row:
+                    current_chunk.append(current_row)
+                    current_row = ibm_db.fetch_assoc(statement)
+                else:
+                    done = True
+                    break
+
+            yield DataFrame(data=current_chunk)
+
 
     def get_rows(self, query: str, binds: Dict[int, Any]) -> List[Dict[str, Any]]:
 
