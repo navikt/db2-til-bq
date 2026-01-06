@@ -1,0 +1,21 @@
+name: Deploy alerts
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    deploy:
+        name: Deploy to dev and prod
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+            actions: read
+
+        steps:
+            - name: Deploy to DEV
+              uses: nais/deploy/actions/deploy@v2
+              env:
+                  CLUSTER: "dev-fss"
+                  RESOURCE: .nais/alert.yaml

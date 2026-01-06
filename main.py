@@ -35,12 +35,16 @@ def db2_to_bq(
         if len(df) > 0:
             df.columns = df.columns.str.lower()
             job_config = table.make_bq_load_job_config()
-            bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
+            bq_client.put_dataframe(
+                df, table_id=table.bq_table_id, job_config=job_config
+            )
             total_number_rows += len(df)
 
         logger.info(f"Chunk of size {len(df)} was written to {table.name.upper()}")
 
-    logger.info(f"Total number of rows written to {table.name.upper()} was {total_number_rows}")
+    logger.info(
+        f"Total number of rows written to {table.name.upper()} was {total_number_rows}"
+    )
 
 
 def main(logger: Logger):
@@ -74,5 +78,6 @@ def update_desc(logger: Logger):
 
 if __name__ == "__main__":
     logs = Logger(name="db2-til-bq")
+    raise Exception("Jobben feila!!")
     main(logger=logs)
     # update_desc(logger=logs)  # Kjøres for å oppdatere tabell og kolonnekommentarer

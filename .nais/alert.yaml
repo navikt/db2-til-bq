@@ -1,0 +1,24 @@
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: db2-til-bq-alert
+  namespace: utsikt
+  labels:
+    team: utsikt
+spec:
+  groups:
+  - name: db2-til-bq-alert
+    rules:
+    - alert: NaisjobFailed
+      expr: kube_job_failed{job_name="db2-til-bq", namespace="<namespace>"} > 0
+      for: 2m
+      annotations:
+        consequence: Data blir ikke oppdatert i Bigquery fra DB2
+        action: "`kubectl describe pod <podname>` -> `kubectl logs <podname>`"
+        summary: |-
+          Naisjobben har feila
+          Sjekk nais consol for logger
+      labels:
+        namespace: utsikt
+        severity: critical
