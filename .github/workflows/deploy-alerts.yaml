@@ -1,8 +1,6 @@
 name: Deploy alerts
 
-on:
-    release:
-        types: [published]
+on: [push]
 
 jobs:
     deploy:
@@ -14,6 +12,8 @@ jobs:
             actions: read
 
         steps:
+            - name: Check out repository code
+              uses: actions/checkout@v5
             - name: Deploy to DEV
               uses: nais/deploy/actions/deploy@v2
               env:
