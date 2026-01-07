@@ -7,6 +7,7 @@ metadata:
     nais.io/read-only-file-system: "false"
 spec:
   schedule: "0 6 * * *" # Runs 6 in the morning
+  failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
     requests:
       cpu: 200m

@@ -78,6 +78,6 @@ def update_desc(logger: Logger):
 
 if __name__ == "__main__":
     logs = Logger(name="db2-til-bq")
-    # raise Exception("Jobben feila!!")
-    main(logger=logs)
+    raise Exception("Jobben feila!!")
+    # main(logger=logs)
     # update_desc(logger=logs)  # Kjøres for å oppdatere tabell og kolonnekommentarer
