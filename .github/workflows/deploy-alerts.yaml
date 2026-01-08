@@ -18,4 +18,9 @@ jobs:
               uses: nais/deploy/actions/deploy@v2
               env:
                   CLUSTER: "dev-fss"
-                  RESOURCE: .nais/alert.yaml,.nais/alert-config.yaml
+                  RESOURCE: .nais/alert.yaml
+            - name: Deploy to PROD
+              uses: nais/deploy/actions/deploy@v2
+              env:
+                  CLUSTER: "prod-fss"
+                  RESOURCE: .nais/alert.yaml
