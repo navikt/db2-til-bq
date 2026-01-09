@@ -18,5 +18,5 @@ spec:
     - secret: db2-license-11
       mountPath: /var/run/secrets/db2-license
   envFrom:
-    - secret: oppdrag-q2-credentials
+    - secret: oppdrag-credentials
     - secret: google-application-credentials
