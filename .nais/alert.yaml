@@ -21,3 +21,4 @@ spec:
       labels:
         namespace: utsikt
         severity: critical
+        alert_type: custom # trengs for alle alerts som skal bruke vår egen config
