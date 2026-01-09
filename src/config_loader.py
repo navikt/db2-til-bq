@@ -22,7 +22,8 @@ class YamlValueError(BaseException):
 
 class ColDataTypes(Enum):
     """
-    Enum class to represent allowed field types
+    Enum class to represent allowed field types.
+    Should not be expanded with numeric or decimal. ibm_db returns these as strings.
     """
 
     INTEGER = "INTEGER"
