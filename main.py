@@ -31,7 +31,7 @@ def db2_to_bq(
     binds = table.generate_binds()
 
     total_number_rows = 0
-    for df in db2_conn.get_chunks(query=query, binds=binds, chunk_size=100000):
+    for df in db2_conn.get_chunks(query=query, binds=binds, chunk_size=1000):
         if len(df) > 0:
             df.columns = df.columns.str.lower()
             job_config = table.make_bq_load_job_config()
