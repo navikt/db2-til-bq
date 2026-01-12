@@ -12,6 +12,7 @@ tables:
     - name: dato_beregnet
       col_data_type: date
       description: Datoen beregningen er utført i Oppdragssystemet.
+      mode: required
 
     - name: kode_faggruppe
       col_data_type: string
