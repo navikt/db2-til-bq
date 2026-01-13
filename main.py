@@ -12,15 +12,17 @@ def get_chunks(
     conn: DB2Connector, chunk_size: int, base_query: str, binds: dict
 ) -> Iterator[DataFrame]:
     offset = 0
-    # base_query = "SELECT beregnings_id,dato_beregnet,kode_faggruppe,tidspkt_reg FROM OS231Q2.t_vent_beregning WHERE tidspkt_reg > Timestamp('2026-01-07 20:07:37.276988')"
+    # base_query = "SELECT beregnings_id,dato_beregnet,kode_faggruppe,tidspkt_reg FROM OS314T1.t_vent_beregning WHERE tidspkt_reg > Timestamp('2026-01-07 20:07:37.276988')"
     done = False
     while not done:
 
         query = (
             f"""{base_query} OFFSET {offset} ROWS FETCH NEXT {chunk_size} ROWS ONLY"""
         )
+        print(query)
+        print(binds)
 
-        df = conn.get_rows_as_dataframe(query=query, binds=binds)
+        df = conn.get_rows_as_dataframe(query=query)  # , binds=binds
         offset += chunk_size
 
         if len(df) < chunk_size:

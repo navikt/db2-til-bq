@@ -20,7 +20,7 @@ class DB2Connector:
     def exec_immediate(self, query):
         ibm_db.exec_immediate(self.connection, query)
 
-    def get_chunks(
+    def get_chunks_old(
         self, query: str, chunk_size: int = 10000, binds: Dict[int, Any] = None
     ) -> Iterator[DataFrame]:
         statement = ibm_db.prepare(self.connection, query)

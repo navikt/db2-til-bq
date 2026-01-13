@@ -38,6 +38,7 @@ def get_from_datetime(
 
     else:
         from_date = datetime.today() - timedelta(days=30)
+        # .strftime("%Y-%m-%d %H:%M:%S.%f")
 
     return from_date
 

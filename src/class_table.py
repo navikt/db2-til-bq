@@ -14,7 +14,13 @@ class TableType(Enum):
 
 class BaseTable(ABC):
 
-    def __init__(self, name: str, description: str, cols: list[SchemaField], table_type: TableType) -> None:
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        cols: list[SchemaField],
+        table_type: TableType,
+    ) -> None:
         self._name = name
         self._description = description
         self._cols = cols
@@ -25,12 +31,10 @@ class BaseTable(ABC):
 
         self._set_envs()
 
-
     def _set_envs(self) -> None:
         self._db2_schema: str = os.environ["DATABASE_SCHEMA"]
         self._bq_dataset: str = self._db2_schema[:2] + "_" + self._db2_schema[-2:]
         self._bq_table_id = f"{self._bq_dataset}.{self._name}"
-
 
     @property
     def name(self) -> str:
@@ -77,9 +81,11 @@ class BaseTable(ABC):
         schema = self.cols
         create_disposition = "CREATE_IF_NEEDED"
 
-        job_config = LoadJobConfig(schema=schema,
-                                   write_disposition=write_disposition,
-                                   create_disposition=create_disposition)
+        job_config = LoadJobConfig(
+            schema=schema,
+            write_disposition=write_disposition,
+            create_disposition=create_disposition,
+        )
 
         return job_config
 
@@ -92,10 +98,11 @@ class BaseTable(ABC):
         return {}
 
 
-
 class DimTable(BaseTable):
     def __init__(self, name: str, description: str, cols: list[SchemaField]) -> None:
-        super().__init__(name=name, description=description, cols=cols, table_type=TableType.DIM)
+        super().__init__(
+            name=name, description=description, cols=cols, table_type=TableType.DIM
+        )
 
     def build_sql_db2(self) -> str:
         return self._build_sql_db2()
@@ -108,12 +115,14 @@ class DimTable(BaseTable):
 
 
 class FakTable(BaseTable):
-    def __init__(self, name: str, description: str, cols: list[SchemaField], check_col: str) -> None:
-        super().__init__(name=name, description=description, cols=cols, table_type=TableType.FAK)
+    def __init__(
+        self, name: str, description: str, cols: list[SchemaField], check_col: str
+    ) -> None:
+        super().__init__(
+            name=name, description=description, cols=cols, table_type=TableType.FAK
+        )
         self._check_col = check_col
         self._from_datetime = None
-
-
 
     @property
     def check_col(self) -> str:
@@ -127,24 +136,24 @@ class FakTable(BaseTable):
     def from_datetime(self, from_datetime: datetime) -> None:
         self._from_datetime = from_datetime
 
-
     def build_sql_db2(self) -> str:
         base_query = self._build_sql_db2()
-        col_query = f"WHERE {self._check_col} > ?"
+        col_query = f"WHERE {self._check_col} > Timestamp('2026-01-07')"  # husk å sette binds igjen
 
         return base_query + col_query
 
     def make_bq_load_job_config(self) -> LoadJobConfig:
-        base_job_config = self._make_bq_load_job_config(write_disposition="WRITE_APPEND")
+        base_job_config = self._make_bq_load_job_config(
+            write_disposition="WRITE_APPEND"
+        )
         _field: str = self.check_col
 
-        partition = table.TimePartitioning(type_="DAY",
-                                           field=_field,
-                                           expiration_ms=1000 * 60 * 60 * 24 * 730)
+        partition = table.TimePartitioning(
+            type_="DAY", field=_field, expiration_ms=1000 * 60 * 60 * 24 * 730
+        )
 
         base_job_config.time_partitioning = partition
         return base_job_config
-
 
     def generate_binds(self) -> dict[int, Any]:
         return {1: self.from_datetime}
