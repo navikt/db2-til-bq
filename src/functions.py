@@ -37,7 +37,7 @@ def get_from_datetime(
         from_date = bq_client.get_rows_as_dataframe(max_query).iloc[0, 0]
 
     else:
-        from_date = datetime.today() - timedelta(days=730)
+        from_date = datetime.today() - timedelta(days=365)
 
     return from_date
 

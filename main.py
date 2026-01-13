@@ -48,7 +48,7 @@ def db2_to_bq(
         query_chunk = f"""{query} 
         OFFSET {offset} ROWS
         FETCH NEXT {chunk_size} ROWS ONLY"""
-
+        logger.info(f"prøver å kjøre query: {query_chunk}")
         job_config = table.make_bq_load_job_config()
 
         df = db2_conn.get_rows_as_dataframe(query=query_chunk, binds=binds)
