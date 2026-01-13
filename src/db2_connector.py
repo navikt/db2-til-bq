@@ -7,7 +7,9 @@ from pandas import DataFrame
 
 class DB2Connector:
 
-    def __init__(self, database_name: str, host: str, port: str, username: str, password: str):
+    def __init__(
+        self, database_name: str, host: str, port: str, username: str, password: str
+    ):
         self._database_name = database_name
         self._host = host
         self._port = port
@@ -15,8 +17,12 @@ class DB2Connector:
         self._password = password
         self.connection: ibm_db.IBM_DBConnection = self._create_connection()
 
+    def exec_immediate(self, query):
+        ibm_db.exec_immediate(self.connection, query)
 
-    def get_chunks(self, query: str, chunk_size: int = 10000, binds: Dict[int, Any] = None)-> Iterator[DataFrame]:
+    def get_chunks(
+        self, query: str, chunk_size: int = 10000, binds: Dict[int, Any] = None
+    ) -> Iterator[DataFrame]:
         statement = ibm_db.prepare(self.connection, query)
 
         for _index, value in binds.items():
@@ -29,7 +35,7 @@ class DB2Connector:
         current_row: Dict[str, Any] = ibm_db.fetch_assoc(statement)
 
         while not done:
-            current_chunk  = []
+            current_chunk = []
             for _ in range(chunk_size):
                 if current_row:
                     current_chunk.append(current_row)
@@ -40,15 +46,12 @@ class DB2Connector:
 
             yield DataFrame(data=current_chunk)
 
-
     def get_rows(self, query: str, binds: Dict[int, Any]) -> List[Dict[str, Any]]:
 
         statement = ibm_db.prepare(self.connection, query)
 
         for _index, value in binds.items():
             ibm_db.bind_param(statement, _index, value)
-
-
 
         ibm_db.execute(statement)
 
@@ -62,7 +65,9 @@ class DB2Connector:
 
         return rows
 
-    def get_rows_as_dataframe(self, query: str, binds: Dict[int, Any] = None) -> DataFrame:
+    def get_rows_as_dataframe(
+        self, query: str, binds: Dict[int, Any] = None
+    ) -> DataFrame:
 
         if not binds:
             binds = {}
@@ -74,7 +79,6 @@ class DB2Connector:
         dsn = self._create_dsn()
         connection = ibm_db.connect(dsn, "", "")
         return connection
-
 
     def _create_dsn(self):
         dsn = (
@@ -97,4 +101,10 @@ class DB2Connector:
         port = os.environ["DATABASE_PORT"]
         host = os.environ["DATABASE_HOST"]
 
-        return DB2Connector(database_name=database_name, host=host, port=port, username=username, password=password)
+        return DB2Connector(
+            database_name=database_name,
+            host=host,
+            port=port,
+            username=username,
+            password=password,
+        )
