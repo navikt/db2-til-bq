@@ -53,6 +53,7 @@ def db2_to_bq(
 
         df = db2_conn.get_rows_as_dataframe(query=query_chunk, binds=binds)
         df.columns = df.columns.str.lower()
+
         bq_client.put_dataframe(df, table_id=table.bq_table_id, job_config=job_config)
         logger.info(f"{len(df)} rows was written to {table.name.upper()}")
 
