@@ -20,38 +20,27 @@ class DB2Connector:
     def exec_immediate(self, query):
         ibm_db.exec_immediate(self.connection, query)
 
-    def get_chunks_old(
-        self, query: str, chunk_size: int = 10000, binds: Dict[int, Any] = None
-    ) -> Iterator[DataFrame]:
-        statement = ibm_db.prepare(self.connection, query)
-
-        for _index, value in binds.items():
-            ibm_db.bind_param(statement, _index, value)
-
-        ibm_db.execute(statement)
+    def get_chunks(self, chunk_size: int, base_query: str, binds: dict) -> Iterator[DataFrame]:
+        offset = 0
 
         done = False
-
-        current_row: Dict[str, Any] = ibm_db.fetch_assoc(statement)
-
         while not done:
-            current_chunk = []
-            for _ in range(chunk_size):
-                if current_row:
-                    current_chunk.append(current_row)
-                    current_row = ibm_db.fetch_assoc(statement)
-                else:
-                    done = True
-                    break
+            query = f"""{base_query} OFFSET {offset} ROWS FETCH NEXT {chunk_size} ROWS ONLY"""
 
-            yield DataFrame(data=current_chunk)
+            df = self.get_rows_as_dataframe(query=query, binds=binds)
+            offset += chunk_size
+
+            if len(df) < chunk_size:
+                done = True
+
+            yield df
 
     def get_rows(self, query: str, binds: Dict[int, Any]) -> List[Dict[str, Any]]:
 
         statement = ibm_db.prepare(self.connection, query)
 
         for _index, value in binds.items():
-            ibm_db.bind_param(statement, _index, value)
+            ibm_db.bind_param(statement, _index, value, ibm_db.SQL_PARAM_INPUT, ibm_db.SQL_CHAR)
 
         ibm_db.execute(statement)
 
@@ -101,10 +90,14 @@ class DB2Connector:
         port = os.environ["DATABASE_PORT"]
         host = os.environ["DATABASE_HOST"]
 
-        return DB2Connector(
+        conn = DB2Connector(
             database_name=database_name,
             host=host,
             port=port,
             username=username,
-            password=password,
-        )
+            password=password )
+
+        if conn._database_name == "TDB2":
+            conn.exec_immediate("SET CURRENT QUERY ACCELERATION ALL")
+
+        return conn

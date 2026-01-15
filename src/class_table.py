@@ -33,7 +33,7 @@ class BaseTable(ABC):
 
     def _set_envs(self) -> None:
         self._db2_schema: str = os.environ["DATABASE_SCHEMA"]
-        self._bq_dataset: str = self._db2_schema[:2] + "_" + self._db2_schema[-2:]
+        self._bq_dataset: str = self._db2_schema[:2]
         self._bq_table_id = f"{self._bq_dataset}.{self._name}"
 
     @property
@@ -129,16 +129,16 @@ class FakTable(BaseTable):
         return self._check_col
 
     @property
-    def from_datetime(self) -> datetime:
+    def from_datetime(self) -> str:
         return self._from_datetime
 
     @from_datetime.setter
-    def from_datetime(self, from_datetime: datetime) -> None:
+    def from_datetime(self, from_datetime: str) -> None:
         self._from_datetime = from_datetime
 
     def build_sql_db2(self) -> str:
         base_query = self._build_sql_db2()
-        col_query = f"WHERE {self._check_col} > Timestamp('2026-01-07')"  # husk å sette binds igjen
+        col_query = f"WHERE {self._check_col} > ?"
 
         return base_query + col_query
 
