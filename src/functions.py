@@ -31,15 +31,15 @@ def load_config_tables(
 
 def get_from_datetime(
     bq_client: BQConnector, table: Union[DimTable, FakTable], table_exists_in_bq: bool
-) -> datetime:
+) -> str:
     if table_exists_in_bq:
         max_query = f"SELECT MAX({table.check_col}) FROM {table.bq_table_id}"
         from_date = bq_client.get_rows_as_dataframe(max_query).iloc[0, 0]
 
     else:
-        from_date = datetime.today() - timedelta(days=30)
+        from_date = datetime.today() - timedelta(days=730)
 
-    return from_date
+    return from_date.strftime('%Y-%m-%d %H:%M:%S.%f')
 
 
 def delete_table(
