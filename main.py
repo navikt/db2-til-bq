@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-from typing import Union, Iterator
-from pandas import DataFrame
+from typing import Union
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
 from src.functions import get_from_datetime, set_and_check_envs, load_config_tables
