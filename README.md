@@ -47,3 +47,5 @@ Obs! nais-jobben bruker versjon 11, mens lokalt (med nye Mac'er) brukes versjon 
 
 ## Formattering
 Vi bruker [Ruff](https://docs.astral.sh/ruff/tutorial/) til formattering av kode.
+
+## Alerting
