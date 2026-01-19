@@ -1,8 +1,19 @@
 import os
 import ibm_db
+import json
 
 from typing import List, Dict, Any, Iterator
 from pandas import DataFrame
+
+from datetime import date, datetime
+
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError("Type %s not serializable" % type(obj))
 
 
 class DB2Connector:
@@ -25,24 +36,28 @@ class DB2Connector:
 
     def get_chunks(
         self, chunk_size: int, base_query: str, binds: dict
-    ) -> Iterator[DataFrame]:
+    ) -> Iterator[list[dict[str, Any]]]:
+
         offset = 0
 
         done = False
         while not done:
             query = f"""{base_query} OFFSET {offset} ROWS FETCH NEXT {chunk_size} ROWS ONLY"""
 
-            df = self.get_rows_as_dataframe(query=query, binds=binds)
+            # df = self.get_rows_as_dataframe(query=query, binds=binds)
+            rows = self.get_rows(query=query, binds=binds)
             offset += chunk_size
 
-            if len(df) < chunk_size:
+            if len(rows) < chunk_size:
                 done = True
 
-            yield df
+            yield rows
 
     def get_rows(self, query: str, binds: Dict[int, Any]) -> List[Dict[str, Any]]:
 
         statement = ibm_db.prepare(self.connection, query)
+        if not binds:
+            binds = {}
 
         for _index, value in binds.items():
             ibm_db.bind_param(
@@ -56,6 +71,9 @@ class DB2Connector:
         current_row: Dict[str, Any] = ibm_db.fetch_assoc(statement)
 
         while current_row:
+            print(current_row)
+            current_row = json.dumps(current_row, default=json_serial).encode("utf-8")
+            print(current_row)
             rows.append(current_row)
             current_row = ibm_db.fetch_assoc(statement)
 
@@ -64,9 +82,6 @@ class DB2Connector:
     def get_rows_as_dataframe(
         self, query: str, binds: Dict[int, Any] = None
     ) -> DataFrame:
-
-        if not binds:
-            binds = {}
 
         rows = self.get_rows(query=query, binds=binds)
         return DataFrame(data=rows)

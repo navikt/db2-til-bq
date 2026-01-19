@@ -36,6 +36,20 @@ class BQConnector:
         query_job = self._execute_query(query=query)
         return self._format_results(query_job=query_job)
 
+    def put_rows(
+        self, rows: list, table_id: str, job_config: bigquery.LoadJobConfig
+    ) -> None:
+        job = self.client.load_table_from_json(
+            json_rows=rows, destination=table_id, job_config=job_config
+        )
+
+        try:
+            job.result()
+        except BadRequest:
+            bq_errors = BigQueryErrors(errors=job.errors)
+            for exception in bq_errors:
+                raise exception
+
     def put_dataframe(
         self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
     ) -> None:
