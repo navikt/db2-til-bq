@@ -116,17 +116,27 @@ class DimTable(BaseTable):
 
 class FakTable(BaseTable):
     def __init__(
-        self, name: str, description: str, cols: list[SchemaField], check_col: str
+        self,
+        name: str,
+        description: str,
+        cols: list[SchemaField],
+        check_col: str,
+        order_cols: list[str],
     ) -> None:
         super().__init__(
             name=name, description=description, cols=cols, table_type=TableType.FAK
         )
         self._check_col = check_col
+        self._order_cols = order_cols
         self._from_datetime = None
 
     @property
     def check_col(self) -> str:
         return self._check_col
+
+    @property
+    def order_cols(self) -> str:
+        return self._order_cols
 
     @property
     def from_datetime(self) -> str:
@@ -139,8 +149,9 @@ class FakTable(BaseTable):
     def build_sql_db2(self) -> str:
         base_query = self._build_sql_db2()
         col_query = f"WHERE {self._check_col} > ?"
+        order_by = f"ORDER BY {','.join([col for col in self.order_cols])}"
 
-        return base_query + col_query
+        return base_query + col_query + order_by
 
     def make_bq_load_job_config(self) -> LoadJobConfig:
         base_job_config = self._make_bq_load_job_config(
