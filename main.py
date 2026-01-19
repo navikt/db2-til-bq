@@ -32,26 +32,31 @@ def db2_to_bq(
 
     chunk_size = 100000
     total_rows = 0
-    for chunk in db2_conn.get_chunks(chunk_size=chunk_size, base_query=base_query, binds=binds):
+
+    for chunk in db2_conn.get_chunks(
+        chunk_size=chunk_size, base_query=base_query, binds=binds
+    ):
         if len(chunk) > 0:
             chunk.columns = chunk.columns.str.lower()
-            bq_client.put_dataframe(chunk, table_id=table.bq_table_id, job_config=job_config)
-
+            bq_client.put_dataframe(
+                chunk, table_id=table.bq_table_id, job_config=job_config
+            )
         total_rows += len(chunk)
         logger.info(
-                f"Total rows: {total_rows} and chunk of size:{len(chunk)} rows was written to {table.name.upper()}"
-            )
+            f"Total rows: {total_rows} and chunk of size: {len(chunk)} rows was written to {table.name.upper()}"
+        )
 
 
 def main(logger: Logger):
     set_and_check_envs()
 
     tables = load_config_tables()
-
     bq_client = BQConnector()
-    db2_conn = DB2Connector.create_connector_from_envs()
+
     for table in tables:
+        db2_conn = DB2Connector.create_connector_from_envs()
         db2_to_bq(table=table, bq_client=bq_client, db2_conn=db2_conn, logger=logger)
+        db2_conn.close()
 
 
 def update_desc(logger: Logger):

@@ -20,7 +20,12 @@ class DB2Connector:
     def exec_immediate(self, query):
         ibm_db.exec_immediate(self.connection, query)
 
-    def get_chunks(self, chunk_size: int, base_query: str, binds: dict) -> Iterator[DataFrame]:
+    def close(self):
+        ibm_db.close(self.connection)
+
+    def get_chunks(
+        self, chunk_size: int, base_query: str, binds: dict
+    ) -> Iterator[DataFrame]:
         offset = 0
 
         done = False
@@ -40,7 +45,9 @@ class DB2Connector:
         statement = ibm_db.prepare(self.connection, query)
 
         for _index, value in binds.items():
-            ibm_db.bind_param(statement, _index, value, ibm_db.SQL_PARAM_INPUT, ibm_db.SQL_CHAR)
+            ibm_db.bind_param(
+                statement, _index, value, ibm_db.SQL_PARAM_INPUT, ibm_db.SQL_CHAR
+            )
 
         ibm_db.execute(statement)
 
@@ -95,7 +102,8 @@ class DB2Connector:
             host=host,
             port=port,
             username=username,
-            password=password )
+            password=password,
+        )
 
         if conn._database_name == "TDB2":
             conn.exec_immediate("SET CURRENT QUERY ACCELERATION ALL")
