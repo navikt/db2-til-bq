@@ -184,3 +184,18 @@ class TableModel(BaseModel):
             if self.check_col:
                 raise YamlValueError("Don't set 'check_col' for DIM tables.")
         return self
+
+    @model_validator(mode="after")
+    def validate_order_cols(self) -> Self:
+        if self.table_type.upper() == TableTypes.FAK.value:
+            if not self.order_cols:
+                raise YamlValueError("Must have 'order_cols' for FAK tables.")
+
+            if not all(order_col in [col.name for col in self.cols] for order_col in self.order_cols):
+                raise YamlValueError("'order_cols' must a subset of 'cols'.")
+
+        else:
+            if self.order_cols:
+                raise YamlValueError("Don't set 'order_cols' for DIM tables.")
+
+        return self
