@@ -34,7 +34,6 @@ class DB2Connector:
         while not done:
             query = f"""{base_query} OFFSET {offset} ROWS FETCH NEXT {chunk_size} ROWS ONLY"""
 
-            # df = self.get_rows_as_dataframe(query=query, binds=binds)
             rows = self.get_rows(query=query, binds=binds)
             offset += chunk_size
 

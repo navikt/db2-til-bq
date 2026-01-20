@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from typing import Any
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -135,7 +134,7 @@ class FakTable(BaseTable):
         return self._check_col
 
     @property
-    def order_cols(self) -> str:
+    def order_cols(self) -> list[str]:
         return self._order_cols
 
     @property
