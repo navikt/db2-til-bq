@@ -108,6 +108,7 @@ class TableModel(BaseModel):
     description: str
     cols: list[ColumnModel]
     check_col: Optional[str] = None
+    order_cols: Optional[list[str]] = None
 
     def to_table_object(self) -> Union[DimTable, FakTable]:
         cols = [col.to_bq_schema_field() for col in self.cols]
@@ -124,6 +125,7 @@ class TableModel(BaseModel):
                 description=self.description,
                 cols=cols,
                 check_col=self.check_col,
+                order_cols=self.order_cols,
             )
 
     @staticmethod
@@ -133,6 +135,7 @@ class TableModel(BaseModel):
         description = table_dict.get("description")
         cols = [ColumnModel.from_dict(col) for col in table_dict.get("cols")]
         check_col = table_dict.get("check_col")
+        order_cols = table_dict.get("order_cols")
 
         return TableModel(
             name=name,
@@ -140,6 +143,7 @@ class TableModel(BaseModel):
             description=description,
             cols=cols,
             check_col=check_col,
+            order_cols=order_cols,
         )
 
     @field_validator("table_type")

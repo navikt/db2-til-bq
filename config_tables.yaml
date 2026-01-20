@@ -3,6 +3,8 @@ tables:
   table_type: fak
   description: Beregninger i Oppdragssystemet
   check_col: tidspkt_reg
+  order_cols: 
+    - beregnings_id
   cols:
     - name: beregnings_id
       col_data_type: integer
@@ -12,6 +14,7 @@ tables:
     - name: dato_beregnet
       col_data_type: date
       description: Datoen beregningen er utført i Oppdragssystemet.
+      mode: required
 
     - name: kode_faggruppe
       col_data_type: string
@@ -26,6 +29,9 @@ tables:
   table_type: fak
   description: Stoppnivå er et begrep i Oppdragssystemet som brukes for nedbryting av beregninger. En beregning kan brytes ned i f.eks. perioder med tilhørende forfallsdato gjelde forskjellige mottakere eller kan gjelde ulike saker (f.eks sykepenger til én bruker men gjelder flere forhold. Stoppnivå id sammen med beregnings id vil unikt identifisere et stoppnivå for en beregning
   check_col: tidspkt_reg
+  order_cols: 
+    - beregnings_id
+    - stoppnivaa_id
   cols:
     - name: beregnings_id
       col_data_type: INTEGER
@@ -80,6 +86,10 @@ tables:
   table_type: fak
   description: Status for stoppnivå. Stoppstatus er synonymt med ventestatus.
   check_col: tidspkt_reg
+  order_cols: 
+    - beregnings_id
+    - stoppnivaa_id
+    - lopenr
   cols:         
     - name: beregnings_id
       col_data_type: INTEGER

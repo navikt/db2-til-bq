@@ -7,15 +7,19 @@ metadata:
     nais.io/read-only-file-system: "false"
 spec:
   schedule: "0 6 * * *" # Runs 6 in the morning
+  failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
+    limits:
+      cpu: 600m
+      memory: 2Gi
     requests:
-      cpu: 200m
-      memory: 128Mi
+      cpu: 600m
+      memory: 512Mi
   webproxy: true
   filesFrom:
     - secret: service-account-key
     - secret: db2-license-11
       mountPath: /var/run/secrets/db2-license
   envFrom:
-    - secret: oppdrag-q2-credentials
+    - secret: oppdrag-credentials
     - secret: google-application-credentials
