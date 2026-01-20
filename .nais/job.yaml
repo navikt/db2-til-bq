@@ -9,6 +9,9 @@ spec:
   schedule: "0 6 * * *" # Runs 6 in the morning
   failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
+    limits:
+      cpu: 600 m
+      memory: 2Gi
     requests:
       cpu: 600m
       memory: 512Mi
