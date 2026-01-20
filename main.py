@@ -31,7 +31,7 @@ def db2_to_bq(
     binds = table.generate_binds()
     job_config = table.make_bq_load_job_config()
 
-    chunk_size = 1000000
+    chunk_size = 500000
     total_rows = 0
 
     for chunk in db2_conn.get_chunks(
