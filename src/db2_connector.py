@@ -1,19 +1,9 @@
 import os
 import ibm_db
-import json
+
 
 from typing import List, Dict, Any, Iterator
 from pandas import DataFrame
-
-from datetime import date, datetime
-
-
-def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
-
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-    raise TypeError("Type %s not serializable" % type(obj))
 
 
 class DB2Connector:
@@ -71,9 +61,6 @@ class DB2Connector:
         current_row: Dict[str, Any] = ibm_db.fetch_assoc(statement)
 
         while current_row:
-            print(current_row)
-            current_row = json.dumps(current_row, default=json_serial).encode("utf-8")
-            print(current_row)
             rows.append(current_row)
             current_row = ibm_db.fetch_assoc(statement)
 

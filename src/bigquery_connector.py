@@ -1,12 +1,24 @@
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any
+from datetime import datetime, date
+
+import json
+import io
 
 from google.cloud import bigquery
+from google.cloud.bigquery import job as bigquery_job
 from google.cloud.exceptions import NotFound
 from google.api_core.exceptions import BadRequest
 from pandas import DataFrame
 from src.logger import Logger
 from src.exceptions import BigQueryErrors
 
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError("Type %s not serializable" % type(obj))
 
 class BQConnector:
     def __init__(self):
@@ -42,6 +54,24 @@ class BQConnector:
         job = self.client.load_table_from_json(
             json_rows=rows, destination=table_id, job_config=job_config
         )
+
+        try:
+            job.result()
+        except BadRequest:
+            bq_errors = BigQueryErrors(errors=job.errors)
+            for exception in bq_errors:
+                raise exception
+
+    def put_rows_alt(self, rows: list[dict[str, Any]], table_id: str, job_config: bigquery.LoadJobConfig):
+        data_str = "\n".join(json.dumps(item, ensure_ascii=False,default=json_serial) for item in rows)
+        encoded_str = data_str.encode()
+        data_file = io.BytesIO(encoded_str)
+        job_config.source_format =  bigquery_job.SourceFormat.NEWLINE_DELIMITED_JSON
+
+        job = self.client.load_table_from_file(file_obj=data_file,
+                                               size=len(encoded_str),
+                                               destination=table_id,
+                                               job_config=job_config)
 
         try:
             job.result()
