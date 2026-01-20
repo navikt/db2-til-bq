@@ -119,6 +119,10 @@ tables:
   table_type: fak
   description: .
   check_col: tidspkt_reg
+  order_cols: 
+    - beregnings_id
+    - stoppnivaa_id
+    - linjenr
   cols:         
     - name: beregnings_id
       col_data_type: integer
