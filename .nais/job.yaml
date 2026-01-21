@@ -11,10 +11,10 @@ spec:
   resources:
     limits:
       cpu: 600m
-      memory: 2Gi
+      memory: 4Gi
     requests:
       cpu: 600m
-      memory: 512Mi
+      memory: 2Gi
   webproxy: true
   filesFrom:
     - secret: service-account-key
