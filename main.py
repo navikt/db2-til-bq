@@ -7,7 +7,6 @@ from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
 
 
-
 def db2_to_bq(
     table: Union[DimTable, FakTable],
     bq_client: BQConnector,
@@ -31,14 +30,16 @@ def db2_to_bq(
     binds = table.generate_binds()
     job_config = table.make_bq_load_job_config()
 
-    chunk_size = 500000
+    chunk_size = 1000000
     total_rows = 0
 
     for chunk in db2_conn.get_chunks(
         chunk_size=chunk_size, base_query=base_query, binds=binds
     ):
         if len(chunk) > 0:
-            bq_client.put_rows_alt(chunk, table_id=table.bq_table_id, job_config=job_config)
+            bq_client.put_rows_alt(
+                chunk, table_id=table.bq_table_id, job_config=job_config
+            )
 
         total_rows += len(chunk)
         logger.info(
