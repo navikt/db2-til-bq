@@ -107,6 +107,6 @@ class DB2Connector:
         )
 
         if conn._database_name == "TDB2":
-            conn.exec_immediate("SET CURRENT QUERY ACCELERATION ALL")
+            conn.exec_immediate("SET CURRENT QUERY ACCELERATION ELIGIBLE")
 
         return conn
