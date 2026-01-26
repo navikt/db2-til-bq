@@ -29,8 +29,8 @@ ENV PYTHONPATH=/app
 
 WORKDIR /app
 
-COPY main.py .
+COPY init.py .
 COPY src ./src
 COPY config_tables.yaml .
 
-ENTRYPOINT [ "/app/venv/bin/python", "main.py" ]
+ENTRYPOINT [ "/app/venv/bin/python", "init.py" ]

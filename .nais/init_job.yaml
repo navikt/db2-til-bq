@@ -1,12 +1,12 @@
 apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
-  name: db2-til-bq
+  name: db2-til-bq-init
   namespace: utsikt
   annotations:
     nais.io/read-only-file-system: "false"
 spec:
-  schedule: "0 6 * * 1-5" # Runs 6 in the morning weekdays
+  schedule: "0 6 27 1 *" # Runs 1 every year on the 27th of january. Pls delete me in 2026.
   failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
     limits:
