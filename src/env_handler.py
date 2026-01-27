@@ -25,7 +25,7 @@ class EnvHandler:
 
     def load_envs(self) -> None:
         if self.local:
-            load_dotenv()#"prod.env")
+            load_dotenv()
 
     def check_envs(self) -> None:
         missing_envs = []
