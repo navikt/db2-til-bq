@@ -1,6 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Union
-
+from dateutil.relativedelta import relativedelta
 from yaml import safe_load
 
 from src.bigquery_connector import BQConnector
@@ -40,6 +40,20 @@ def get_from_datetime(
         from_date = datetime.today() - timedelta(days=730)
 
     return from_date.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+
+def generate_limits(start_datetime: datetime) -> list[date]:
+    start_date = start_datetime.date().replace(day=1)
+    end_date = datetime.today().date() + relativedelta(months=1)
+
+    date_list = []
+
+    current = start_date
+    while current <= end_date:
+        date_list.append(current)
+        current += relativedelta(months=1)
+
+    return date_list
 
 
 def delete_table(

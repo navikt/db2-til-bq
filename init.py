@@ -1,27 +1,13 @@
 #!/usr/bin/env python3
 from typing import Union
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
+
 
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
-from src.functions import get_from_datetime, set_and_check_envs, load_config_tables
+from src.functions import get_from_datetime, set_and_check_envs, load_config_tables, generate_limits
 from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
-
-
-def generate_limits(start_datetime: datetime) -> list[date]:
-    start_date = start_datetime.date().replace(day=1)
-    end_date = datetime.today().date() + relativedelta(months=1)
-
-    date_list = []
-
-    current = start_date
-    while current <= end_date:
-        date_list.append(current)
-        current += relativedelta(months=1)
-
-    return date_list
 
 
 def db2_to_bq(
@@ -45,7 +31,8 @@ def db2_to_bq(
 
     dates = generate_limits(start_datetime=start_datetime)
 
-    bq_client._execute_query(f"delete from {table.bq_table_id} where {table.check_col} >= {dates[0]}")
+    bq_client.query(f"delete from {table.bq_table_id} where {table.check_col} >= DATE('{dates[0]}')")
+
     logger.info(f"Deleted rows after {dates[0]}")
 
     column_names: str = ",".join([col.name for col in table.cols])

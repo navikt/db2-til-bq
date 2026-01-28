@@ -36,6 +36,16 @@ class BQConnector:
         """
         return self.client.query(query=query)
 
+    def query(self, query: str):
+        query_job = self._execute_query(query=query)
+
+        try:
+            query_job.result()
+        except BadRequest:
+            bq_errors = BigQueryErrors(errors=query_job.errors)
+            for exception in bq_errors:
+                raise exception
+
     def get_rows(self, query: str) -> List[Dict[str, Any]]:
         """
         Metode for å kjøre spørring med resultater og som skal formaters som en liste av dicts.
