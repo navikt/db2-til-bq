@@ -6,7 +6,7 @@ metadata:
   annotations:
     nais.io/read-only-file-system: "false"
 spec:
-  schedule: "0 6 27 1 *" # Runs 1 every year on the 27th of january. Pls delete me in 2026.
+  schedule: "0 6 30 1 *" # Runs 1 every year on the 30th of january. Pls delete me in 2026.
   failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
     limits:

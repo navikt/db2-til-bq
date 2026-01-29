@@ -5,7 +5,12 @@ from datetime import datetime
 
 from src.bigquery_connector import BQConnector
 from src.db2_connector import DB2Connector
-from src.functions import get_from_datetime, set_and_check_envs, load_config_tables, generate_limits
+from src.functions import (
+    get_from_datetime,
+    set_and_check_envs,
+    load_config_tables,
+    generate_limits,
+)
 from src.class_table import DimTable, FakTable, TableType
 from src.logger import Logger
 
@@ -31,16 +36,18 @@ def db2_to_bq(
 
     dates = generate_limits(start_datetime=start_datetime)
 
-    bq_client.query(f"delete from {table.bq_table_id} where {table.check_col} >= DATE('{dates[0]}')")
+    if table_exists_in_bq:
+        bq_client.query(
+            f"delete from {table.bq_table_id} where {table.check_col} >= DATE('{dates[0]}')"
+        )
 
-    logger.info(f"Deleted rows after {dates[0]}")
+        logger.info(f"Deleted rows after {dates[0]}")
 
     column_names: str = ",".join([col.name for col in table.cols])
     base_query = f"SELECT {column_names} FROM {table.db2_schema}.{table.name} "
     order_query = f"ORDER BY {','.join(table.order_cols)}"
 
     job_config = table.make_bq_load_job_config()
-
 
     for i in range(len(dates) - 1):
         first_date = dates[i].strftime("%Y-%m-%d")
@@ -80,7 +87,9 @@ def main(logger: Logger, table_name: str = None):
     ]
 
     if table_name:
-        tables_to_run = [table for table in tables_to_run if table.name.lower() == table_name]
+        tables_to_run = [
+            table for table in tables_to_run if table.name.lower() == table_name
+        ]
 
     for table in tables_to_run:
         db2_conn = DB2Connector.create_connector_from_envs()
