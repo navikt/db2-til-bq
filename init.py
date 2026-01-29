@@ -99,4 +99,4 @@ def main(logger: Logger, table_name: str = None):
 
 if __name__ == "__main__":
     logs = Logger(name="db2-til-bq-init")
-    main(logger=logs, table_name="t_vent_detalj")
+    main(logger=logs, table_name="t_vent_stoppnivaa")

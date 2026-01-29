@@ -57,6 +57,16 @@ tables:
       col_data_type: STRING
       max_length: 4
 
+    - name: skattesats_brukt
+      description: Skattesats
+      col_data_type: STRING
+      max_length: 12
+
+    - name: type_bilag
+      description: Type bilag
+      col_data_type: STRING
+      max_length: 2
+
     - name: kode_fagomraade
       col_data_type: STRING
       description: En kode som angir selve ytelsen som beregningen gjelder f.eks. 'AAP' for arbeidsavklaringspenger
