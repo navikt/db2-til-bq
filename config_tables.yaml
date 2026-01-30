@@ -57,6 +57,16 @@ tables:
       col_data_type: STRING
       max_length: 4
 
+    - name: skattesats_brukt
+      description: Skattesats
+      col_data_type: STRING
+      max_length: 12
+
+    - name: type_bilag
+      description: Type bilag
+      col_data_type: STRING
+      max_length: 2
+
     - name: kode_fagomraade
       col_data_type: STRING
       description: En kode som angir selve ytelsen som beregningen gjelder f.eks. 'AAP' for arbeidsavklaringspenger
@@ -138,6 +148,22 @@ tables:
       col_data_type: integer
       description: En del av unik identifikator i tabellen
       mode: REQUIRED
+
+    - name: linje_id
+      col_data_type: integer
+      description: løpenummer på informasjon fra fagsystemet om utbetaling. Skatten vil ikke ha et linjenummer og derfor 0.
+
+    - name: kode_klasse
+      col_data_type: string
+      description: klassifikasjon av hva utbetalingen gjelder 
+
+    - name: dato_faktisk_fom
+      col_data_type: date
+      description: Startdatoen stoppnivået faktisk gjelder for. Sammen med dato_faktisk_tom utgjør dette den faktiske perioden stoppnivået gjelder for.
+
+    - name: dato_faktisk_tom
+      col_data_type: date
+      description: Sluttdatoen stoppnivået faktisk gjelder for. Sammen med dato_faktisk_tom utgjør dette den faktiske perioden stoppnivået gjelder for.
 
     - name: belop
       col_data_type: string
