@@ -1,8 +1,9 @@
 name: Build and deploy
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
+    tags:
+      - init*
 
 jobs:
   build_and_deploy:
@@ -20,23 +21,23 @@ jobs:
         id: changed-files
         uses: "nais/what-changed@main"
         with:
-          files: .nais/job.yaml
+          files: .nais/init_job.yaml
       - name: Build and push image and SBOM to OCI registry
         if: steps.changed-files.outputs.changed != 'only-inputs'
         uses: nais/docker-build-push@v0
         id: docker-build-push
         with:
           team: utsikt
-          dockerfile: Dockerfile
+          dockerfile: Dockerfile_init
       - name: Deploy to PROD
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "prod-fss"
-          RESOURCE: .nais/job.yaml
+          RESOURCE: .nais/init_job.yaml
           WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
       - name: Deploy to DEV
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: "dev-fss"
-          RESOURCE: .nais/job.yaml # same list as in changed-files step above
+          RESOURCE: .nais/init_job.yaml # same list as in changed-files step above
           WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
