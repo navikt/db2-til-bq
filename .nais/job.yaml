@@ -10,11 +10,10 @@ spec:
   failedJobsHistoryLimit: 0 #vil fjerne historikken så vi slipper å få alert hver time
   resources:
     limits:
-      cpu: 600m
-      memory: 4Gi
-    requests:
-      cpu: 600m
       memory: 2Gi
+    requests:
+      cpu: 100m
+      memory: 1536Mi
   webproxy: true
   filesFrom:
     - secret: service-account-key
