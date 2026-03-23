@@ -13,6 +13,7 @@ spec:
     requests:
       cpu: 200m
       memory: 2Gi
+  backoffLimit: 0
   webproxy: true
   filesFrom:
     - secret: service-account-key
