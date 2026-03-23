@@ -12,7 +12,7 @@ spec:
       memory: 2Gi
     requests:
       cpu: 200m
-      memory: 1700Mi
+      memory: 2Gi
   webproxy: true
   filesFrom:
     - secret: service-account-key
