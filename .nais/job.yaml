@@ -9,7 +9,7 @@ spec:
   schedule: "0 6 * * 1-5" # Runs 6 in the morning weekdays
   resources:
     limits:
-      memory: 2Gi
+      memory: 2500Mi
     requests:
       cpu: 200m
       memory: 2Gi
