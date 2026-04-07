@@ -6,14 +6,14 @@ metadata:
   annotations:
     nais.io/read-only-file-system: "false"
 spec:
-  schedule: "0 6 * * 1-5" # Runs 6 in the morning weekdays
+  schedule: "0 5 * * 1-5" # Runs 5am UTC weekdays (7am Oslo time summer and 6am Oslo time winter)
   resources:
     limits:
       memory: 2500Mi
     requests:
       cpu: 200m
       memory: 2Gi
-  backoffLimit: 0
+  backoffLimit: 1
   webproxy: true
   filesFrom:
     - secret: service-account-key
