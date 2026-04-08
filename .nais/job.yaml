@@ -9,10 +9,10 @@ spec:
   schedule: "0 5 * * 1-5" # Runs 5am UTC weekdays (7am Oslo time summer and 6am Oslo time winter)
   resources:
     limits:
-      memory: 2500Mi
+      memory: 5Gi
     requests:
       cpu: 200m
-      memory: 2Gi
+      memory: 4Gi
   backoffLimit: 1
   webproxy: true
   filesFrom:
