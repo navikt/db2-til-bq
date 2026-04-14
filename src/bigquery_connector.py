@@ -74,6 +74,12 @@ class BQConnector:
                 raise exception
 
     def put_rows_alt(self, rows: list[dict[str, Any]], table_id: str, job_config: bigquery.LoadJobConfig):
+        """
+        Metode for å laste opp rader til BQ-tabell. Radene må være i en liste og som dicts. Vi bruker vår egen
+        json-serializer for å håndtere datetime-objekter. Radene blir gjort om til strenger, puttet i en bytes buffer og
+        lastet opp med load_table_from_file. load_table_from_json fungerte ikke som ønsket, ettersom datetime objekter
+        ikke ble håndtert som forventet.
+        """
         data_str = "\n".join(json.dumps(item, ensure_ascii=False,default=json_serial) for item in rows)
         encoded_str = data_str.encode()
         data_file = io.BytesIO(encoded_str)
