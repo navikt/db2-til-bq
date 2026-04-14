@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
-from typing import Union
+from typing import Union, Any
 from yaml import safe_load
 
 from src.bigquery_connector import BQConnector
@@ -34,7 +34,8 @@ def get_from_datetime(
 ) -> str:
     if table_exists_in_bq:
         max_query = f"SELECT MAX({table.check_col}) FROM {table.bq_table_id}"
-        from_date = bq_client.get_rows_as_dataframe(max_query).iloc[0, 0]
+        from_date_dict: dict[str, Any] = bq_client.get_rows(query=max_query)[0]
+        from_date = list(from_date_dict.values())[0]
 
     else:
         from_date = datetime.today() - timedelta(days=730)

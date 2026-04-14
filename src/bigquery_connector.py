@@ -8,7 +8,6 @@ from google.cloud import bigquery
 from google.cloud.bigquery import job as bigquery_job
 from google.cloud.exceptions import NotFound
 from google.api_core.exceptions import BadRequest
-from pandas import DataFrame
 from src.logger import Logger
 from src.exceptions import BigQueryErrors
 
@@ -19,6 +18,7 @@ def json_serial(obj):
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
     raise TypeError("Type %s not serializable" % type(obj))
+
 
 class BQConnector:
     def __init__(self):
@@ -35,7 +35,6 @@ class BQConnector:
 
         """
         return self.client.query(query=query)
-
 
     def query(self, query: str):
         query_job = self._execute_query(query=query)
@@ -73,35 +72,30 @@ class BQConnector:
             for exception in bq_errors:
                 raise exception
 
-    def put_rows_alt(self, rows: list[dict[str, Any]], table_id: str, job_config: bigquery.LoadJobConfig):
+    def put_rows_alt(
+        self,
+        rows: list[dict[str, Any]],
+        table_id: str,
+        job_config: bigquery.LoadJobConfig,
+    ):
         """
         Metode for å laste opp rader til BQ-tabell. Radene må være i en liste og som dicts. Vi bruker vår egen
         json-serializer for å håndtere datetime-objekter. Radene blir gjort om til strenger, puttet i en bytes buffer og
         lastet opp med load_table_from_file. load_table_from_json fungerte ikke som ønsket, ettersom datetime objekter
         ikke ble håndtert som forventet.
         """
-        data_str = "\n".join(json.dumps(item, ensure_ascii=False,default=json_serial) for item in rows)
+        data_str = "\n".join(
+            json.dumps(item, ensure_ascii=False, default=json_serial) for item in rows
+        )
         encoded_str = data_str.encode()
         data_file = io.BytesIO(encoded_str)
-        job_config.source_format =  bigquery_job.SourceFormat.NEWLINE_DELIMITED_JSON
+        job_config.source_format = bigquery_job.SourceFormat.NEWLINE_DELIMITED_JSON
 
-        job = self.client.load_table_from_file(file_obj=data_file,
-                                               size=len(encoded_str),
-                                               destination=table_id,
-                                               job_config=job_config)
-
-        try:
-            job.result()
-        except BadRequest:
-            bq_errors = BigQueryErrors(errors=job.errors)
-            for exception in bq_errors:
-                raise exception
-
-    def put_dataframe(
-        self, df: DataFrame, table_id: str, job_config: bigquery.LoadJobConfig
-    ) -> None:
-        job = self.client.load_table_from_dataframe(
-            dataframe=df, destination=table_id, job_config=job_config
+        job = self.client.load_table_from_file(
+            file_obj=data_file,
+            size=len(encoded_str),
+            destination=table_id,
+            job_config=job_config,
         )
 
         try:
@@ -110,18 +104,6 @@ class BQConnector:
             bq_errors = BigQueryErrors(errors=job.errors)
             for exception in bq_errors:
                 raise exception
-
-    def get_rows_as_dataframe(self, query: str) -> DataFrame:
-        """
-        Metode for å kjøre spørring med resultater som returneres som en pandas DataFrame
-        Args:
-            query (str): Spørring som skal kjøres
-
-        Returns (DataFrame): DataFrame med resultater
-
-        """
-        rows = self.get_rows(query=query)
-        return DataFrame(data=rows)
 
     @staticmethod
     def _create_client() -> bigquery.Client:
