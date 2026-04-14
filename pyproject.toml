@@ -5,16 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "db-dtypes>=1.4.3",
-    "python-dotenv>=1.1.1",
-    "google-auth>=2.40.3",
-    "google-cloud-bigquery>=3.34.0",
-    "google-cloud-bigquery-storage>=2.32.0",
-    "ibm-db>=3.2.6",
-    "ibm-db-sa>=0.4.1",
-    "pandas>=2.3.0",
-    "pandas-gbq>=0.29.2",
-    "pydantic>= 2.12.5",
+    "db-dtypes>=1.5.1",
+    "python-dotenv>=1.2.2",
+    "google-auth>=2.49.2",
+    "google-cloud-bigquery>=3.41.0",
+    "google-cloud-bigquery-storage>=2.37.0",
+    "ibm-db>=3.2.8",
+    "ibm-db-sa>=0.4.4",
+    "pandas>=3.0.2",
+    "pandas-gbq>=0.35.0",
+    "pydantic>= 2.13.0",
     "pyyaml>= 6.0.3"
 ]
 
@@ -23,7 +23,7 @@ exclude = [".venv", "explore/"]
 
 [dependency-groups]
 dev = [
-    "python-dotenv>=1.1.1",
-    "ruff>=0.14.9",
+    "python-dotenv>=1.2.2",
+    "ruff>=0.15.10",
     "toml-to-requirements>=0.3.0",
 ]
