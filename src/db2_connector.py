@@ -3,7 +3,6 @@ import ibm_db
 
 
 from typing import List, Dict, Any, Iterator
-from pandas import DataFrame
 
 
 class DB2Connector:
@@ -65,12 +64,6 @@ class DB2Connector:
 
         return rows
 
-    def get_rows_as_dataframe(
-        self, query: str, binds: Dict[int, Any] = None
-    ) -> DataFrame:
-
-        rows = self.get_rows(query=query, binds=binds)
-        return DataFrame(data=rows)
 
     def _create_connection(self) -> ibm_db.IBM_DBConnection:
         dsn = self._create_dsn()
