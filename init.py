@@ -92,6 +92,7 @@ def main(logger: Logger, table_name: str = None):
         ]
 
     for table in tables_to_run:
+        logger.info(f"Starting to process table: {table.name}")
         db2_conn = DB2Connector.create_connector_from_envs()
         db2_to_bq(table=table, bq_client=bq_client, db2_conn=db2_conn, logger=logger)
         db2_conn.close()
@@ -99,4 +100,4 @@ def main(logger: Logger, table_name: str = None):
 
 if __name__ == "__main__":
     logs = Logger(name="db2-til-bq-init")
-    main(logger=logs, table_name="t_vent_stoppnivaa")
+    main(logger=logs, table_name="t_oppdrag_kilde")
