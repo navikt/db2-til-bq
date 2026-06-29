@@ -67,6 +67,11 @@ tables:
       col_data_type: STRING
       max_length: 2
 
+    - name: enhet_behandl
+      col_data_type: STRING
+      description: En kode som angir enheten som skal behandle. 4819 for NØP og 8020 for NØS
+      max_length: 13
+
     - name: kode_fagomraade
       col_data_type: STRING
       description: En kode som angir selve ytelsen som beregningen gjelder f.eks. 'AAP' for arbeidsavklaringspenger
