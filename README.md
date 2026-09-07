@@ -49,11 +49,9 @@ Obs! nais-jobben bruker versjon 11, mens lokalt (med nye Mac'er) brukes versjon 
 Vi bruker [Ruff](https://docs.astral.sh/ruff/tutorial/) til formattering av kode.
 
 ### Alerting og logger
-Varsel er satt opp i [alert.yaml](https://github.com/navikt/db2-til-bq/blob/main/.nais/alert.yaml) ved hjelp av Prometheus, og deployet med [deploy-alerts.yaml](https://github.com/navikt/db2-til-bq/blob/main/.github/workflows/deploy-alerts.yaml).
+Varsel er satt opp i [alert.yaml](https://github.com/navikt/db2-til-bq/blob/main/.nais/alert.yaml) dersom naisjobben feiler ved hjelp av Prometheus. Den er deployet til nais med [deploy-alerts.yaml](https://github.com/navikt/db2-til-bq/blob/main/.github/workflows/deploy-alerts.yaml) og kan ses under `Alerts` i Nais Console. Varsel blir sendt til slack-kanalen #utsikt-ops som er definert under `Team Settings` i Nais Console, og alerten vil stå som "Firing" og sende varsler frem til man sletter den feilende naisjobben.
 
-Loggene kan bli sett i [Grafana Loki](https://grafana.nav.cloud.nais.io/a/grafana-lokiexplore-app/). Mer om [observability i nais](https://docs.nais.io/observability/).
-
-For å slette jobben må man da inn i kubectl og finner jobber ved `kubectl get jobs`  og så sletter det med `kubectl delete job <jobname>` . Vi har gjort en feature request til nais om å få dette inn i naisconsollen, fordi i prod krever det en del innlogging for å kunne slette jobber fra consollen.
+Logger fra naisjobben kan bli sett i [Grafana Loki](https://grafana.nav.cloud.nais.io/a/grafana-lokiexplore-app/). Mer om [observability i nais](https://docs.nais.io/observability/).
 
 ---
 
