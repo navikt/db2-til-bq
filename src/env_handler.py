@@ -46,8 +46,16 @@ class EnvHandler:
             if license_source.exists():
                 resolved_source = license_source.resolve()
                 shutil.copy2(resolved_source, license_destination)
+
+                if  license_destination.exists():
+                    with license_destination.open('r') as license_file:
+                        license_content = license_file.read()
+                        print(license_content)
+
             else:
                 raise Db2LicenseNotFoundError(f"Db2 license not found at {license_source}")
+
+
 
     @staticmethod
     def _get_required_envs() -> list[str]:
