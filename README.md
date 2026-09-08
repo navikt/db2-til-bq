@@ -43,7 +43,6 @@ GOOGLE_CLOUD_PROJECT=xxx
 
 Må også legge til IBM db2 lisensfil for Python her `.venv/lib/python3.13/site-packages/clidriver/license`. Denne finnes lagret som nais secret [her](https://console.nav.cloud.nais.io/team/utsikt/dev-fss/secret/db2-license-12)
 
-Obs! nais-jobben bruker versjon 11, mens lokalt (med nye Mac'er) brukes versjon 12. Begge er lagret som nais secrets.
 
 ### Formattering
 Vi bruker [Ruff](https://docs.astral.sh/ruff/tutorial/) til formattering av kode.
