@@ -13,7 +13,7 @@ jobs:
       id-token: write
       actions: read
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # Fetch all history for what-changed action
       - name: Determine what to do
@@ -23,19 +23,19 @@ jobs:
           files: .nais/job.yaml
       - name: Build and push image and SBOM to OCI registry
         if: steps.changed-files.outputs.changed != 'only-inputs'
-        uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5 # v0
+        uses: nais/docker-build-push@0e73849f69ff260ee27597553c0a7848ca4e9795 # v0
         id: docker-build-push
         with:
           team: utsikt
           dockerfile: Dockerfile
       - name: Deploy to PROD
-        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
         env:
           CLUSTER: "prod-fss"
           RESOURCE: .nais/job.yaml
           WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
       - name: Deploy to DEV
-        uses: nais/deploy/actions/deploy@2d18f050f07b6a007864c6a57070ed915d571beb # v2
+        uses: nais/deploy/actions/deploy@027a91857992525139798892f2804b0ca21f4af6 # v2
         env:
           CLUSTER: "dev-fss"
           RESOURCE: .nais/job.yaml # same list as in changed-files step above
