@@ -287,3 +287,75 @@ tables:
     - name: tidspkt_reg
       col_data_type: DATETIME
       description: Tidspunktet for når raden er lastet inn i tabellen.
+
+- name: t_kontoregel
+  table_type: dim
+  description: Kodeverk for kontoregel. Kobling mellom kode_klasse fra oppdragssystemet og hovedkonto/underkonto som blir brukt videre i utbetalingssystemet.
+  cols: 
+    - name: kode_klasse
+      col_data_type: STRING
+      description: Kode for kontoregel.
+      mode: REQUIRED
+      max_length: 20
+
+    - name: dato_fom
+      col_data_type: DATE
+      description: Gyldig fra-dato for kontoregel.
+      mode: REQUIRED
+  
+    - name: aar
+      col_data_type: INTEGER
+      description: År. Brukes til å koble til tabellen t_konto
+      mode: REQUIRED
+
+    - name: hovedkontonr
+      col_data_type: STRING
+      description: Hovedkontonummer. Brukes til å koble til tabellen t_konto
+      mode: REQUIRED
+      max_length: 3
+
+    - name: underkontonr
+      col_data_type: STRING
+      description: Underkontonummer. Brukes til å koble til tabellen t_konto
+      mode: REQUIRED
+      max_length: 4
+  
+    - name: tidspkt_reg
+      col_data_type: DATETIME
+      description: Tidspunktet for når raden er lastet inn i tabellen.
+
+- name: t_konto
+  table_type: dim
+  description: Kodeverk for konto. Beskrivelser av hovedkonto/underkonto.
+  cols: 
+  
+    - name: aar
+      col_data_type: INTEGER
+      description: År. Brukes til å koble til tabellen t_kontoregel
+      mode: REQUIRED
+
+    - name: hovedkontonr
+      col_data_type: STRING
+      description: Hovedkontonummer. Brukes til å koble til tabellen t_kontoregel
+      mode: REQUIRED
+      max_length: 3
+
+    - name: underkontonr
+      col_data_type: STRING
+      description: Underkontonummer. Brukes til å koble til tabellen t_konto
+      mode: REQUIRED
+      max_length: 4
+
+    - name: hovedkonto_navn
+      col_data_type: STRING
+      description: Navn på hovedkontonummer
+      max_length: 25
+
+    - name: underkonto_navn
+      col_data_type: STRING
+      description: Navn på underkontonummer
+      max_length: 25
+  
+    - name: tidspkt_reg
+      col_data_type: DATETIME
+      description: Tidspunktet for når raden er lastet inn i tabellen.
