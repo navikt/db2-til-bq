@@ -1,0 +1,49 @@
+tables:
+- name: v_saldo_detalj
+  table_type: fak
+  description: Summert beløp debet og kredit for posteringer i UR fordelt på konto.
+  check_col: sist_oppdatert
+  order_cols: 
+    - dato_postert_ur
+  cols:
+    - name: dato_postert_ur
+      col_data_type: date
+      description: Datoen posteringen ble gjort i UR.
+      mode: required
+
+    - name: hovedkontonr
+      col_data_type: string
+      description: Hovedkontonummeret i UR.
+      max_length: 3
+      mode: required
+
+    - name: underkontonr
+      col_data_type: string
+      description: Underkontonummeret i UR.
+      max_length: 3
+
+    - name: kode_oppdrag_num
+      col_data_type: integer
+      description: Koden for oppdrag.
+
+    - name: antall_mottakere
+      col_data_type: integer
+      description: Antall mottakere.
+
+    - name: sum_debet
+      col_data_type: string
+      description: Summen av debet for posteringene i UR.
+
+    - name: sum_kredit
+      col_data_type: string
+      description: Summen av kredit for posteringene i UR.
+
+    - name: registrert
+      col_data_type: datetime
+      description: Tidspunktet for når raden ble registrert i UR.
+      mode: required
+      
+    - name: sist_oppdatert
+      col_data_type: datetime
+      description: Tidspunktet for når raden sist ble oppdatert i UR.
+      mode: required
