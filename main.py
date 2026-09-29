@@ -50,7 +50,7 @@ def db2_to_bq(
 def main(logger: Logger):
     set_and_check_envs()
 
-    tables = load_config_tables()
+    tables = load_config_tables(config_path="OS_tables.yaml")
     bq_client = BQConnector()
 
     for table in tables:
@@ -62,7 +62,7 @@ def main(logger: Logger):
 def update_desc(logger: Logger):
     set_and_check_envs()
 
-    tables = load_config_tables()
+    tables = load_config_tables(config_path="OS_tables.yaml")
 
     logger.info("Oppdater beskrivelse og schema i alle BigQuery-tabellene")
 

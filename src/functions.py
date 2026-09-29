@@ -17,7 +17,7 @@ def set_and_check_envs() -> None:
 
 
 def load_config_tables(
-    config_path: str = "config_tables.yaml",
+    config_path: str,
 ) -> list[Union[DimTable, FakTable]]:
     with open(config_path) as file:
         tables = safe_load(file)
