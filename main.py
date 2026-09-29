@@ -47,8 +47,8 @@ def db2_to_bq(
         )
 
 
-def main(logger: Logger):
-    set_and_check_envs()
+def run_os_tables(logger: Logger):
+    set_and_check_envs(system="OS")
 
     tables = load_config_tables(config_path="OS_tables.yaml")
     bq_client = BQConnector()
@@ -59,8 +59,14 @@ def main(logger: Logger):
         db2_conn.close()
 
 
+def main(logger: Logger):
+
+    run_os_tables(logger=logger)
+    # run_ur_tables(logger=logger)
+
+
 def update_desc(logger: Logger):
-    set_and_check_envs()
+    set_and_check_envs(system="OS")
 
     tables = load_config_tables(config_path="OS_tables.yaml")
 

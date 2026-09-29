@@ -21,4 +21,5 @@ spec:
       mountPath: /var/run/secrets/db2-license
   envFrom:
     - secret: oppdrag-credentials
+    - secret: ur-credentials #dette går nok ikke
     - secret: google-application-credentials

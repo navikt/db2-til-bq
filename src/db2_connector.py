@@ -64,7 +64,6 @@ class DB2Connector:
 
         return rows
 
-
     def _create_connection(self) -> ibm_db.IBM_DBConnection:
         dsn = self._create_dsn()
         connection = ibm_db.connect(dsn, "", "")
@@ -84,10 +83,10 @@ class DB2Connector:
         return dsn
 
     @staticmethod
-    def create_connector_from_envs() -> "DB2Connector":
+    def create_connector_from_envs(system="OS") -> "DB2Connector":
         database_name = os.environ["DATABASE_NAME"]
-        username = os.environ["DATABASE_USERNAME"]
-        password = os.environ["DATABASE_PASSWORD"]
+        username = os.environ[f"DATABASE_USERNAME_{system}"]
+        password = os.environ[f"DATABASE_PASSWORD_{system}"]
         port = os.environ["DATABASE_PORT"]
         host = os.environ["DATABASE_HOST"]
 

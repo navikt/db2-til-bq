@@ -31,7 +31,7 @@ class BaseTable(ABC):
         self._set_envs()
 
     def _set_envs(self) -> None:
-        self._db2_schema: str = os.environ["DATABASE_SCHEMA"]
+        self._db2_schema: str = os.environ["DATABASE_SCHEMA_OS"]
         self._bq_dataset: str = self._db2_schema[:2]
         self._bq_table_id = f"{self._bq_dataset}.{self._name}"
 
