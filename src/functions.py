@@ -10,8 +10,8 @@ from src.env_handler import EnvHandler
 from src.config_loader import TableModel
 
 
-def set_and_check_envs() -> None:
-    env_handler = EnvHandler()
+def set_and_check_envs(source_name: str) -> None:
+    env_handler = EnvHandler(source_name=source_name)
     env_handler.load_envs()
     env_handler.check_envs()
 
