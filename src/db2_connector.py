@@ -6,7 +6,6 @@ from typing import List, Dict, Any, Iterator
 
 
 class DB2Connector:
-
     def __init__(
         self, database_name: str, host: str, port: str, username: str, password: str
     ):
@@ -83,10 +82,10 @@ class DB2Connector:
         return dsn
 
     @staticmethod
-    def create_connector_from_envs(system="OS") -> "DB2Connector":
+    def create_connector_from_envs() -> "DB2Connector":
         database_name = os.environ["DATABASE_NAME"]
-        username = os.environ[f"DATABASE_USERNAME_{system}"]
-        password = os.environ[f"DATABASE_PASSWORD_{system}"]
+        username = os.environ[f"DATABASE_USERNAME"]
+        password = os.environ[f"DATABASE_PASSWORD"]
         port = os.environ["DATABASE_PORT"]
         host = os.environ["DATABASE_HOST"]
 
