@@ -14,13 +14,13 @@ tables:
     - name: hovedkontonr
       col_data_type: string
       description: Hovedkontonummeret i UR.
-      max_length: 3
+      max_length: 3 
       mode: required
 
     - name: underkontonr
       col_data_type: string
       description: Underkontonummeret i UR.
-      max_length: 3
+      max_length: 4
 
     - name: kode_oppdrag_num
       col_data_type: integer

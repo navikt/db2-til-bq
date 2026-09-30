@@ -106,7 +106,6 @@ def db2_to_bq(
             bq_client.put_rows_alt(
                 chunk, table_id=table.bq_table_id, job_config=job_config
             )
-
         total_rows += len(chunk)
         logger.info(
             f"Total rows: {total_rows} and chunk of size: {len(chunk)} rows was written to {table.name.upper()}"
