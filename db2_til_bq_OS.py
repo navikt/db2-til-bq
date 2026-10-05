@@ -6,9 +6,9 @@ from src.logger import Logger
 
 
 def main(logger: Logger):
-    set_and_check_envs(source_name="UR")
+    set_and_check_envs(source_name="OS")
 
-    tables = load_config_tables(config_path="UR_tables.yaml")
+    tables = load_config_tables(config_path="tables_OS.yaml")
     bq_client = BQConnector()
 
     for table in tables:
@@ -18,5 +18,5 @@ def main(logger: Logger):
 
 
 if __name__ == "__main__":
-    logs = Logger(name="UR_db2_til_bq")
+    logs = Logger(name="db2_til_bq_OS")
     main(logger=logs)
