@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
-  name: db2-til-bq-OS
+  name: db2-til-bq-os
   namespace: utsikt
   annotations:
     nais.io/read-only-file-system: "false"
