@@ -1,4 +1,4 @@
-FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.13-dev AS builder
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.14-dev AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Use distroless images for runtime
-FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.13
+FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.14
 
 # Copy system libraries required by ibm_db from builder
 COPY --from=builder /lib/libpam.* /lib/libcrypt.* /lib/
