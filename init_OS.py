@@ -57,7 +57,7 @@ def db2_to_bq(
 
         binds = {1: first_date, 2: last_date}
 
-        logger.info(f"Running for month: {dates[i].strftime("%B")}-{dates[i].year}")
+        logger.info(f"Running for month: {dates[i].strftime('%B')}-{dates[i].year}")
 
         chunk_size = 1_000_000
         total_rows = 0
@@ -99,5 +99,5 @@ def main(logger: Logger, table_name: str = None):
 
 
 if __name__ == "__main__":
-    logs = Logger(name="db2-til-bq-init")
+    logs = Logger(name="db2-til-bq-init-OS")
     main(logger=logs, table_name="t_vent_stoppnivaa")
