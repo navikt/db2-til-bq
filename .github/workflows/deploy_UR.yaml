@@ -1,0 +1,48 @@
+name: Build and deploy
+on:
+    push:
+        branches:
+            - main
+        paths:
+            - .nais/job_UR.yaml
+            - Dockerfile_UR
+            - db2_til_bq_UR.py
+            - tables_UR.yaml
+            - src/**
+
+jobs:
+    build_and_deploy:
+        name: Build, push and deploy
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            id-token: write
+            actions: read
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  fetch-depth: 0 # Fetch all history for what-changed action
+            - name: Determine what to do
+              id: changed-files
+              uses: "nais/what-changed@main"
+              with:
+                  files: .nais/job_UR.yaml
+            - name: Build and push image and SBOM to OCI registry
+              if: steps.changed-files.outputs.changed != 'only-inputs'
+              uses: nais/docker-build-push@423a915c9b72edf2ba848b88171ccb0489e2a40a # v0
+              id: docker-build-push
+              with:
+                  team: utsikt
+                  dockerfile: Dockerfile_UR
+            - name: Deploy to PROD
+              uses: nais/deploy/actions/deploy@1de80da70ad26556ecdc5964a8b7ec3bbed98120 # v2
+              env:
+                  CLUSTER: "prod-fss"
+                  RESOURCE: .nais/job_UR.yaml
+                  WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
+            - name: Deploy to DEV
+              uses: nais/deploy/actions/deploy@1de80da70ad26556ecdc5964a8b7ec3bbed98120 # v2
+              env:
+                  CLUSTER: "dev-fss"
+                  RESOURCE: .nais/job_UR.yaml # same list as in changed-files step above
+                  WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}

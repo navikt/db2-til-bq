@@ -1,0 +1,24 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  name: db2-til-bq-ur
+  namespace: utsikt
+  annotations:
+    nais.io/read-only-file-system: "false"
+spec:
+  schedule: "0 5 * * 1-5" # Runs 5am UTC weekdays (7am Oslo time summer and 6am Oslo time winter)
+  resources:
+    limits:
+      memory: 5Gi
+    requests:
+      cpu: 200m
+      memory: 4Gi
+  backoffLimit: 1
+  webproxy: true
+  filesFrom:
+    - secret: service-account-key
+    - secret: db2-license-12
+      mountPath: /var/run/secrets/db2-license
+  envFrom:
+    - secret: ur-credentials
+    - secret: google-application-credentials

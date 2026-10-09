@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .nais/job_OS.yaml
+      - Dockerfile_OS
+      - db2_til_bq_OS.py
+      - tables_OS.yaml
+      - src/**
 
 jobs:
   build_and_deploy:
