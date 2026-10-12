@@ -29,8 +29,8 @@ ENV PYTHONPATH=/app
 
 WORKDIR /app
 
-COPY db2_til_bq_OS.py .
-COPY src ./src
-COPY tables_OS.yaml .
+COPY ../db2_til_bq_OS.py .
+COPY ../src ./src
+COPY ../table_configs/tables_OS.yaml .
 
 ENTRYPOINT [ "/app/venv/bin/python", "db2_til_bq_OS.py" ]

@@ -8,7 +8,7 @@ from src.logger import Logger
 def main(logger: Logger):
     set_and_check_envs(source_name="UR")
 
-    tables = load_config_tables(config_path="tables_UR.yaml")
+    tables = load_config_tables(config_path="table_configs/tables_UR.yaml")
     bq_client = BQConnector()
 
     for table in tables:
