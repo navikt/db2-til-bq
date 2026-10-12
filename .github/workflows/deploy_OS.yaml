@@ -4,6 +4,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/deploy_OS.yaml
       - .nais/job_OS.yaml
       - dockerfiles/Dockerfile_OS
       - db2_til_bq_OS.py

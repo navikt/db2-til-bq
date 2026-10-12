@@ -4,6 +4,7 @@ on:
         branches:
             - main
         paths:
+            - .github/workflows/deploy_UR.yaml
             - .nais/job_UR.yaml
             - dockerfiles/Dockerfile_UR
             - db2_til_bq_UR.py
