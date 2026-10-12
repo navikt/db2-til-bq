@@ -31,6 +31,6 @@ WORKDIR /app
 
 COPY ../init_OS.py .
 COPY ../src ./src
-COPY ../table_configs/tables_OS.yaml .
+COPY ../table_configs/tables_OS.yaml ./table_configs/
 
 ENTRYPOINT [ "/app/venv/bin/python", "init_OS.py" ]
