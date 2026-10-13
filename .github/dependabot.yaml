@@ -9,22 +9,30 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       gh:
         patterns:
           - "*"
+
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/dockerfiles/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       docker:
         patterns:
           - "*"
+
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 3
     groups:
       pip:
         patterns:
