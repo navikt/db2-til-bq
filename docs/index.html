@@ -13,7 +13,7 @@
     <h2>Innhold</h2>
     <ul>
       <li><a href="#oversikt">Oversikt</a></li>
-      <li><a href="#kilder">OS og UR</a></li>
+      <li><a href="#kilder">Entrypoint-filene</a></li>
       <li><a href="#flyt">Felles kjøreflyt</a></li>
       <li><a href="#moduler">Python-moduler</a></li>
     </ul>
@@ -26,10 +26,10 @@
       <p>De vanlige entrypointene er <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_OS.py"><code>db2_til_bq_OS.py</code></a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_UR.py"><code>db2_til_bq_UR.py</code></a>. Begge kaller <a href="src/functions.html#db2_to_bq"><code>db2_to_bq()</code></a> for hver konfigurert tabell.</p>
     </section>
     <section id="kilder">
-      <h2>OS og UR</h2>
+      <h2>Entrypoint-filene</h2>
       <div class="cards">
-        <div class="card"><h3>OS</h3><p>Bruker miljøet <code>OS</code> og <a href="https://github.com/navikt/db2-til-bq/blob/main/table_configs/tables_OS.yaml"><code>table_configs/tables_OS.yaml</code></a>. Lesing og lasting følger den felles flyten under.</p></div>
-        <div class="card"><h3>UR</h3><p>Bruker miljøet <code>UR</code> og <a href="https://github.com/navikt/db2-til-bq/blob/main/table_configs/tables_UR.yaml"><code>table_configs/tables_UR.yaml</code></a>. Dataene og DB2-tilkoblingen bestemmes av dette miljøet og konfigurasjonen.</p></div>
+        <div class="card"><h3><code>db2_til_bq_OS.py</code></h3><p>Bruker miljøet <code>OS</code> og <a href="https://github.com/navikt/db2-til-bq/blob/main/table_configs/tables_OS.yaml"><code>table_configs/tables_OS.yaml</code></a>. Lesing og lasting følger den felles flyten under.</p></div>
+        <div class="card"><h3><code>db2_til_bq_UR.py</code></h3><p>Bruker miljøet <code>UR</code> og <a href="https://github.com/navikt/db2-til-bq/blob/main/table_configs/tables_UR.yaml"><code>table_configs/tables_UR.yaml</code></a>. Dataene og DB2-tilkoblingen bestemmes av dette miljøet og konfigurasjonen.</p></div>
       </div>
       <p>Begge Nais-jobbene er satt opp til kl. 05:00 UTC mandag til fredag. <code>init_OS.py</code> er et eget initialiseringsskript og er ikke del av denne felles kjørebanen.</p>
     </section>
@@ -37,7 +37,7 @@
       <h2>Felles kjøreflyt</h2>
       <ol class="flow">
         <li><strong>Oppstart:</strong> Entrypointet oppretter en logger og kaller <code>main()</code>. <a href="src/functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a> laster lokale miljøvariabler ved lokal kjøring, kopierer DB2-lisensfilen på Nais og kontrollerer påkrevde variabler.</li>
-        <li><strong>Konfigurasjon:</strong> <a href="src/functions.html#load_config_tables"><code>load_config_tables()</code></a> leser OS- eller UR-YAML og lager tabellobjekter. Deretter opprettes én <a href="src/bigquery_connector.html#bqconnector"><code>BQConnector</code></a> for hele kjøringen.</li>
+        <li><strong>Konfigurasjon:</strong> <a href="src/functions.html#load_config_tables"><code>load_config_tables()</code></a> leser <code>table_configs/tables_OS.yaml</code> eller <code>table_configs/tables_UR.yaml</code> og lager tabellobjekter. Deretter opprettes én <a href="src/bigquery_connector.html#bqconnector"><code>BQConnector</code></a> for hele kjøringen.</li>
         <li><strong>Per tabell:</strong> Det opprettes en ny <a href="src/db2_connector.html#db2connector"><code>DB2Connector</code></a>. <a href="src/functions.html#db2_to_bq"><code>db2_to_bq()</code></a> velger oppførsel ut fra tabelltypen:
           <div class="branches">
             <div class="branch"><h3>Faktatabell</h3><p>Sjekk om tabellen finnes i BigQuery. Bruk <code>MAX(check_col)</code> som nedre grense når den finnes; ellers brukes dagens dato minus 730 dager. Les DB2 med <code>WHERE check_col &gt; ?</code> og <code>ORDER BY</code>. BigQuery-jobben bruker <code>WRITE_APPEND</code> og daglig partisjonering.</p></div>
@@ -60,7 +60,6 @@
         <li><a href="src/exceptions.html"><code>exceptions.py</code></a> – feilklasser</li>
         <li><a href="src/functions.html"><code>functions.py</code></a> – overføringsflyt og hjelpefunksjoner</li>
         <li><a href="src/logger.html"><code>logger.py</code></a> – loggoppsett og formatering</li>
-        <li><a href="src/__init__.html"><code>__init__.py</code></a> – tom pakkemodul</li>
       </ul>
     </section>
   </main>

@@ -4,23 +4,61 @@
 <body>
 <header class="site-header"><a href="../index.html">db2-til-bq</a> / <code>src/env_handler.py</code></header>
 <div class="layout">
-  <nav class="contents" aria-label="Innhold på siden"><h2>Innhold</h2><ul><li><a href="#oppsummering">Oppsummering</a></li><li><a href="#klasser">Klasser</a></li><li><a href="#funksjoner">Metoder</a></li></ul></nav>
+  <nav class="contents" aria-label="Innhold på siden"><h2>Innhold</h2><ul><li><a href="#oppsummering">Oppsummering</a></li><li><a href="#klasser">Klasser</a></li></ul></nav>
   <main>
     <h1><code>env_handler.py</code></h1>
     <section id="oppsummering"><h2>Oppsummering</h2><p>Laster lokale miljøvariabler, kontrollerer påkrevde verdier og kopierer DB2-lisensfilen i Nais-miljøet. <a href="https://github.com/navikt/db2-til-bq/blob/main/src/env_handler.py">Se kildefilen</a>.</p></section>
-    <section id="klasser"><h2>Klasser</h2><ul><li><a href="#envhandler"><code>EnvHandler</code></a> er en dataklasse for kildeavhengig miljøoppsett.</li></ul><section class="symbol" id="envhandler"><h3><code>EnvHandler</code></h3><p>Opprettes av <a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a> med <code>OS</code> eller <code>UR</code> som kildenavn.</p></section></section>
-    <section id="funksjoner"><h2>Metoder</h2>
-      <ul class="jump-list"><li><a href="#post_init"><code>__post_init__</code></a></li><li><a href="#iter"><code>__iter__</code></a></li><li><a href="#load_envs"><code>load_envs</code></a></li><li><a href="#check_envs"><code>check_envs</code></a></li><li><a href="#copy_db2_license"><code>_copy_db2_license</code></a></li><li><a href="#get_required_envs"><code>_get_required_envs</code></a></li><li><a href="#set_local"><code>_set_local</code></a></li></ul>
-      <section class="symbol" id="post_init"><h3><code>__post_init__()</code></h3><p>Fyller listen over nødvendige variabler, avgjør om kjøringen er lokal og kopierer lisensfilen når den kjører på Nais.</p><p><strong>Kalles av:</strong> Dataklassens genererte <code>__init__()</code> når <a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a> oppretter objektet.</p></section>
-      <section class="symbol" id="iter"><h3><code>__iter__()</code></h3><p>Gjør listen over påkrevde miljøvariabler tilgjengelig ved iterasjon over objektet.</p><p><strong>Kalles av:</strong> Ingen iterasjon over <code>EnvHandler</code> i repoet; kan kalles av Pythons iterasjonsprotokoll.</p></section>
-      <section class="symbol" id="load_envs"><h3><code>load_envs()</code></h3><p>Laster <code>OS.env</code> eller <code>UR.env</code> ved lokal kjøring. På Nais brukes allerede tilgjengelige miljøvariabler.</p><p><strong>Kalles av:</strong> <a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a>.</p></section>
-      <section class="symbol" id="check_envs"><h3><code>check_envs()</code></h3><p>Kontrollerer at alle nødvendige miljøvariabler finnes; kaster <a href="exceptions.html#envsnotseterror"><code>EnvsNotSetError</code></a> hvis noen mangler.</p><p><strong>Kalles av:</strong> <a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a>.</p></section>
-      <section class="symbol" id="copy_db2_license"><h3><code>_copy_db2_license()</code></h3><p>Kopierer DB2-lisensfilen til Python-miljøet i Nais. Mangler filen, kastes <a href="exceptions.html#db2licensenotfounderror"><code>Db2LicenseNotFoundError</code></a>.</p><p><strong>Kalles av:</strong> <a href="#post_init"><code>__post_init__()</code></a>.</p></section>
-      <section class="symbol" id="get_required_envs"><h3><code>_get_required_envs()</code></h3><p>Returnerer navnene på nødvendige DB2- og GCP-miljøvariabler.</p><p><strong>Kalles av:</strong> <a href="#post_init"><code>__post_init__()</code></a>.</p></section>
-      <section class="symbol" id="set_local"><h3><code>_set_local()</code></h3><p>Sjekker om <code>NAIS_CLUSTER_NAME</code> mangler; hvis ja, regnes kjøringen som lokal.</p><p><strong>Kalles av:</strong> <a href="#post_init"><code>__post_init__()</code></a>.</p></section>
+    <section id="klasser"><h2>Klasser</h2><ul><li><a href="#envhandler"><code>EnvHandler</code></a> er en dataklasse for kildeavhengig miljøoppsett.</li></ul>
+      <details class="symbol class-group" id="envhandler">
+        <summary><code>EnvHandler</code></summary>
+        <div class="symbol-content">
+          <p>Opprettes av <a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a> med <code>OS</code> eller <code>UR</code> som kildenavn.</p>
+          <p class="type-info"><strong>Arver fra:</strong> Ingen eksplisitt baseklasse.</p>
+          <div class="docstring">
+            <p class="doc-label"><strong>Opprettelse</strong></p>
+            <p><code>@dataclass</code> genererer <code>EnvHandler(source_name: str)</code>.</p>
+            <p class="doc-label"><strong>Args:</strong></p>
+            <dl class="doc-args"><dt><code>source_name</code> (<code>str</code>)</dt><dd>Kildenavnet som brukes til miljøoppsettet.</dd></dl>
+            <p class="doc-label"><strong>Felt satt i <a href="#post_init"><code>__post_init__()</code></a>:</strong></p>
+            <p>Disse feltene tas ikke imot av konstruktøren.</p>
+            <dl class="doc-args"><dt><code>required_envs</code> (<code>list[str]</code>, <code>init=False</code>)</dt><dd>Navnene på påkrevde miljøvariabler.</dd><dt><code>local</code> (<code>bool</code>, <code>init=False</code>)</dt><dd>Om kjøringen er lokal.</dd></dl>
+          </div>
+          <div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a></td><td>Oppretter instans</td></tr></tbody></table></div>
+        <p class="method-label"><strong>Metoder</strong></p>
+      <details class="symbol method" id="post_init">
+        <summary><code>__post_init__()</code></summary>
+        <div class="symbol-content"><p>Fyller listen over nødvendige variabler, avgjør om kjøringen er lokal og kopierer lisensfilen når den kjører på Nais.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p><code>None</code>: Ingen returverdi.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td>Dataklassens genererte <code>__init__()</code></td><td>Kaller hook ved opprettelse fra set_and_check_envs()</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="iter">
+        <summary><code>__iter__()</code></summary>
+        <div class="symbol-content"><p>Gjør listen over påkrevde miljøvariabler tilgjengelig ved iterasjon over objektet.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p>Returtype ikke annotert.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td>Ingen interne kallere</td><td>Kan kalles av Pythons iterasjonsprotokoll</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="load_envs">
+        <summary><code>load_envs()</code></summary>
+        <div class="symbol-content"><p>Laster <code>OS.env</code> eller <code>UR.env</code> ved lokal kjøring. På Nais brukes allerede tilgjengelige miljøvariabler.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p><code>None</code>: Ingen returverdi.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a></td><td>Kaller</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="check_envs">
+        <summary><code>check_envs()</code></summary>
+        <div class="symbol-content"><p>Kontrollerer at alle nødvendige miljøvariabler finnes; kaster <a href="exceptions.html#envsnotseterror"><code>EnvsNotSetError</code></a> hvis noen mangler.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p><code>None</code>: Ingen returverdi.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="functions.html#set_and_check_envs"><code>set_and_check_envs()</code></a></td><td>Kaller</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="copy_db2_license">
+        <summary><code>_copy_db2_license()</code></summary>
+        <div class="symbol-content"><p>Kopierer DB2-lisensfilen til Python-miljøet i Nais. Mangler filen, kastes <a href="exceptions.html#db2licensenotfounderror"><code>Db2LicenseNotFoundError</code></a>.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p>Returtype ikke annotert.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="#post_init"><code>__post_init__()</code></a></td><td>Kaller</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="get_required_envs">
+        <summary><code>_get_required_envs()</code></summary>
+        <div class="symbol-content"><p>Returnerer navnene på nødvendige DB2- og GCP-miljøvariabler.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p><code>list[str]</code>: Navnene på påkrevde miljøvariabler.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="#post_init"><code>__post_init__()</code></a></td><td>Kaller</td></tr></tbody></table></div></div>
+      </details>
+      <details class="symbol method" id="set_local">
+        <summary><code>_set_local()</code></summary>
+        <div class="symbol-content"><p>Sjekker om <code>NAIS_CLUSTER_NAME</code> mangler; hvis ja, regnes kjøringen som lokal.</p><div class="docstring"><p class="doc-label"><strong>Returns:</strong></p><p><code>bool</code>: Om programmet kjører lokalt.</p></div><div class="table-scroll"><table class="callers"><caption>Kalles av</caption><thead><tr><th scope="col">Kaller</th><th scope="col">Relasjon</th></tr></thead><tbody><tr><td><a href="#post_init"><code>__post_init__()</code></a></td><td>Kaller</td></tr></tbody></table></div></div>
+      </details></div>
+      </details>
     </section>
+
   </main>
 </div>
 <footer class="site-footer"><a href="../index.html">Til oversikten</a></footer>
+<script src="../details.js" defer></script>
 </body>
 </html>
