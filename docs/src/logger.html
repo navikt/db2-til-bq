@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="nb">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>logger.py | db2-til-bq</title><link rel="stylesheet" href="../style.css"></head>
+<body>
+<header class="site-header"><a href="../index.html">db2-til-bq</a> / <code>src/logger.py</code></header>
+<div class="layout">
+  <nav class="contents" aria-label="Innhold på siden"><h2>Innhold</h2><ul><li><a href="#oppsummering">Oppsummering</a></li><li><a href="#klasser">Klasser</a></li><li><a href="#funksjoner">Metoder</a></li></ul></nav>
+  <main>
+    <h1><code>logger.py</code></h1>
+    <section id="oppsummering"><h2>Oppsummering</h2><p>Setter opp Python-logging med farger i konsollen og valgfri fil. <a href="https://github.com/navikt/db2-til-bq/blob/main/src/logger.py">Se kildefilen</a>.</p></section>
+    <section id="klasser"><h2>Klasser</h2><ul><li><a href="#logger"><code>Logger</code></a> gir metoder for loggnivåene.</li><li><a href="#streamformatter"><code>StreamFormatter</code></a> farger konsollogg etter nivå.</li></ul>
+      <section class="symbol" id="logger"><h3><code>Logger</code></h3><p>Opprettes av <code>main</code>-oppsettet i <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_OS.py">OS</a>, <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_UR.py">UR</a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>.</p></section>
+      <section class="symbol" id="streamformatter"><h3><code>StreamFormatter</code></h3><p>Underklasse av <code>logging.Formatter</code> som velger format etter loggnivå. Opprettes av <a href="#configure_logger"><code>Logger._configure_logger()</code></a>.</p></section>
+    </section>
+    <section id="funksjoner"><h2>Metoder</h2>
+      <ul class="jump-list"><li><a href="#init">Logger.__init__</a></li><li><a href="#log">Logger._log</a></li><li><a href="#debug">Logger.debug</a></li><li><a href="#info">Logger.info</a></li><li><a href="#warning">Logger.warning</a></li><li><a href="#error">Logger.error</a></li><li><a href="#critical">Logger.critical</a></li><li><a href="#configure_logger">Logger._configure_logger</a></li><li><a href="#format">StreamFormatter.format</a></li></ul>
+      <section class="symbol" id="init"><h3><code>Logger.__init__(name, log_to_file, level)</code></h3><p>Lagrer innstillinger og kaller <a href="#configure_logger"><code>_configure_logger()</code></a>. Standardnivå er <code>DEBUG</code>; fillogging er av som standard.</p><p><strong>Kalles av:</strong> Oppstarten i <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_OS.py">OS</a>, <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_UR.py">UR</a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>.</p></section>
+      <section class="symbol" id="log"><h3><code>Logger._log(message, level)</code></h3><p>Sender meldingen til Pythons logger med angitt nivå.</p><p><strong>Kalles av:</strong> <a href="#debug"><code>debug()</code></a>, <a href="#info"><code>info()</code></a>, <a href="#warning"><code>warning()</code></a>, <a href="#error"><code>error()</code></a> og <a href="#critical"><code>critical()</code></a>.</p></section>
+      <section class="symbol" id="debug"><h3><code>Logger.debug(message)</code></h3><p>Logger på <code>DEBUG</code>-nivå.</p><p><strong>Kalles av:</strong> Ingen funksjoner eller klasser i repoet.</p></section>
+      <section class="symbol" id="info"><h3><code>Logger.info(message)</code></h3><p>Logger på <code>INFO</code>-nivå.</p><p><strong>Kalles av:</strong> <a href="functions.html#db2_to_bq"><code>db2_to_bq()</code></a>, <a href="functions.html#update_desc"><code>update_desc()</code></a>, <a href="bigquery_connector.html#create_dataset"><code>BQConnector.create_dataset()</code></a>, <a href="bigquery_connector.html#delete_table"><code>delete_table()</code></a>, <a href="bigquery_connector.html#update_table_and_col_descriptions"><code>update_table_and_col_descriptions()</code></a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>.</p></section>
+      <section class="symbol" id="warning"><h3><code>Logger.warning(message)</code></h3><p>Logger på <code>WARNING</code>-nivå.</p><p><strong>Kalles av:</strong> Ingen funksjoner eller klasser i repoet.</p></section>
+      <section class="symbol" id="error"><h3><code>Logger.error(message)</code></h3><p>Logger på <code>ERROR</code>-nivå.</p><p><strong>Kalles av:</strong> Ingen funksjoner eller klasser i repoet.</p></section>
+      <section class="symbol" id="critical"><h3><code>Logger.critical(message)</code></h3><p>Logger på <code>CRITICAL</code>-nivå.</p><p><strong>Kalles av:</strong> Ingen funksjoner eller klasser i repoet.</p></section>
+      <section class="symbol" id="configure_logger"><h3><code>Logger._configure_logger()</code></h3><p>Konfigurerer konsollhandleren med <code>StreamFormatter</code>, eventuelt også en filhandler, og setter loggnivå og propagasjon.</p><p><strong>Kalles av:</strong> <a href="#init"><code>Logger.__init__()</code></a>.</p></section>
+      <section class="symbol" id="format"><h3><code>StreamFormatter.format(record)</code></h3><p>Velger farget formatstreng ut fra nivået og formaterer loggposten.</p><p><strong>Kalles av:</strong> Pythons <code>logging.StreamHandler</code> gjennom formateringsprotokollen etter oppsett i <a href="#configure_logger"><code>_configure_logger()</code></a>.</p></section>
+    </section>
+  </main>
+</div>
+<footer class="site-footer"><a href="../index.html">Til oversikten</a></footer>
+</body>
+</html>

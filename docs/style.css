@@ -1,0 +1,74 @@
+:root {
+  color-scheme: light;
+  font: 16px/1.6 system-ui, sans-serif;
+  color: #202938;
+  background: #f5f7f9;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #164d85; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 3px solid #c34b00; outline-offset: 3px; }
+code { overflow-wrap: anywhere; }
+h1, h2, h3 { line-height: 1.25; }
+h2 { margin-top: 2.25rem; }
+h3 { margin-top: 1.5rem; }
+p, li { max-width: 78ch; }
+.site-header {
+  background: #143b60;
+  color: white;
+  padding: 1rem max(1rem, calc((100vw - 74rem)/2));
+}
+.site-header a { color: white; font-weight: 700; }
+.layout {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+  gap: 2rem;
+}
+.contents {
+  align-self: start;
+  position: sticky;
+  top: 1rem;
+  padding: 1rem;
+  border: 1px solid #c9d5df;
+  border-radius: .5rem;
+  background: white;
+}
+.contents h2 { margin: 0 0 .5rem; font-size: 1.05rem; }
+.contents ul { list-style: none; padding: 0; margin: 0; }
+.contents li { margin: .4rem 0; }
+main { min-width: 0; }
+.lead { font-size: 1.15rem; }
+.cards, .branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.card, .branch, .flow > li, .symbol {
+  background: white;
+  border: 1px solid #c9d5df;
+  border-radius: .5rem;
+  padding: 1rem;
+}
+.card h3, .branch h3 { margin-top: 0; }
+.flow { padding-left: 2rem; }
+.flow > li { margin: 0 0 1rem; padding-left: 1.25rem; }
+.flow > li::marker { font-weight: bold; color: #164d85; }
+.symbol { margin: 1rem 0; }
+.symbol h3 { margin-top: 0; }
+.symbol p { margin-bottom: .5rem; }
+.symbol p:last-child { margin-bottom: 0; }
+.symbol:target { border: 2px solid #164d85; }
+.jump-list { columns: 2 17rem; }
+.jump-list li { break-inside: avoid; }
+.note { border-left: .3rem solid #995c00; padding: .5rem 1rem; background: #fff5e3; }
+.site-footer { border-top: 1px solid #c9d5df; padding: 1rem; text-align: center; }
+@media (max-width: 48rem) {
+  .layout { display: block; }
+  .contents { position: static; }
+}

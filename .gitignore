@@ -5,3 +5,10 @@
 __pycache__
 .idea
 *.log
+.nav-pilot
+.github/agents
+.github/hooks
+.github/instructions
+.github/prompts
+.github/skills
+.github/.nav-pilot-state.json

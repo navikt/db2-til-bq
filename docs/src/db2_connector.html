@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="nb">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>db2_connector.py | db2-til-bq</title><link rel="stylesheet" href="../style.css"></head>
+<body>
+<header class="site-header"><a href="../index.html">db2-til-bq</a> / <code>src/db2_connector.py</code></header>
+<div class="layout">
+  <nav class="contents" aria-label="Innhold på siden"><h2>Innhold</h2><ul><li><a href="#oppsummering">Oppsummering</a></li><li><a href="#klasser">Klasser</a></li><li><a href="#funksjoner">Metoder</a></li></ul></nav>
+  <main>
+    <h1><code>db2_connector.py</code></h1>
+    <section id="oppsummering"><h2>Oppsummering</h2><p>Oppretter DB2-tilkobling fra miljøvariabler og henter rader med parameterbinding. <a href="https://github.com/navikt/db2-til-bq/blob/main/src/db2_connector.py">Se kildefilen</a>.</p></section>
+    <section id="klasser"><h2>Klasser</h2><ul><li><a href="#db2connector"><code>DB2Connector</code></a> samler tilkobling, spørringer og bitvis lesing.</li></ul><section class="symbol" id="db2connector"><h3><code>DB2Connector</code></h3><p>Brukes av begge vanlige entrypoints og av <code>init_OS.py</code>, via fabrikkmetoden <a href="#create_connector_from_envs"><code>create_connector_from_envs()</code></a>.</p></section></section>
+    <section id="funksjoner"><h2>Metoder</h2>
+      <ul class="jump-list"><li><a href="#init"><code>__init__</code></a></li><li><a href="#exec_immediate"><code>exec_immediate</code></a></li><li><a href="#close"><code>close</code></a></li><li><a href="#get_chunks"><code>get_chunks</code></a></li><li><a href="#get_rows"><code>get_rows</code></a></li><li><a href="#create_connection"><code>_create_connection</code></a></li><li><a href="#create_dsn"><code>_create_dsn</code></a></li><li><a href="#create_connector_from_envs"><code>create_connector_from_envs</code></a></li></ul>
+      <section class="symbol" id="init"><h3><code>DB2Connector.__init__(...)</code></h3><p>Lagrer tilkoblingsparametere og oppretter DB2-tilkoblingen via <a href="#create_connection"><code>_create_connection()</code></a>.</p><p><strong>Kalles av:</strong> <a href="#create_connector_from_envs"><code>create_connector_from_envs()</code></a>.</p></section>
+      <section class="symbol" id="exec_immediate"><h3><code>exec_immediate(query)</code></h3><p>Utfører en spørring umiddelbart på den åpne DB2-tilkoblingen.</p><p><strong>Kalles av:</strong> <a href="#create_connector_from_envs"><code>create_connector_from_envs()</code></a> når databasen heter <code>TDB2</code>.</p></section>
+      <section class="symbol" id="close"><h3><code>close()</code></h3><p>Lukker DB2-tilkoblingen.</p><p><strong>Kalles av:</strong> <code>main()</code> i <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_OS.py">OS</a>, <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_UR.py">UR</a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>, etter at overføringen har returnert.</p></section>
+      <section class="symbol" id="get_chunks"><h3><code>get_chunks(chunk_size, base_query, binds)</code></h3><p>Legger <code>OFFSET</code> og <code>FETCH NEXT</code> til spørringen, henter rader i biter og avslutter når resultatet har færre rader enn bitstørrelsen. Returnerer også siste bit dersom den er tom.</p><p><strong>Kalles av:</strong> <a href="functions.html#db2_to_bq"><code>functions.db2_to_bq()</code></a> og <code>db2_to_bq()</code> i <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>.</p></section>
+      <section class="symbol" id="get_rows"><h3><code>get_rows(query, binds)</code></h3><p>Forbereder og kjører DB2-spørringen med bind-parametere og returnerer radene som dictionaries.</p><p><strong>Kalles av:</strong> <a href="#get_chunks"><code>get_chunks()</code></a>.</p></section>
+      <section class="symbol" id="create_connection"><h3><code>_create_connection()</code></h3><p>Åpner DB2-tilkoblingen med en DSN fra <a href="#create_dsn"><code>_create_dsn()</code></a>.</p><p><strong>Kalles av:</strong> <a href="#init"><code>__init__()</code></a>.</p></section>
+      <section class="symbol" id="create_dsn"><h3><code>_create_dsn()</code></h3><p>Setter sammen DB2-parametere til tilkoblingsstrengen.</p><p><strong>Kalles av:</strong> <a href="#create_connection"><code>_create_connection()</code></a>.</p></section>
+      <section class="symbol" id="create_connector_from_envs"><h3><code>create_connector_from_envs()</code></h3><p>Leser DB2-parametere fra miljøvariabler og oppretter tilkoblingen. For <code>TDB2</code> aktiveres også spørringsakselerasjon.</p><p><strong>Kalles av:</strong> <code>main()</code> i <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_OS.py">OS</a>, <a href="https://github.com/navikt/db2-til-bq/blob/main/db2_til_bq_UR.py">UR</a> og <a href="https://github.com/navikt/db2-til-bq/blob/main/init_OS.py"><code>init_OS.py</code></a>.</p></section>
+    </section>
+  </main>
+</div>
+<footer class="site-footer"><a href="../index.html">Til oversikten</a></footer>
+</body>
+</html>
