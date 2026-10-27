@@ -1,7 +1,7 @@
 apiVersion: nais.io/v1
 kind: Naisjob
 metadata:
-  name: db2-til-bq-OS
+  name: db2-til-bq-os
   namespace: utsikt
   annotations:
     nais.io/read-only-file-system: "false"
@@ -21,5 +21,4 @@ spec:
       mountPath: /var/run/secrets/db2-license
   envFrom:
     - secret: oppdrag-credentials
-    - secret: ur-credentials #dette går nok ikke
     - secret: google-application-credentials
