@@ -6,6 +6,18 @@ from src.logger import Logger
 
 
 def main(logger: Logger):
+    """Kjør den konfigurerte DB2-til-BigQuery-jobben for UR.
+
+    Parameters
+    ----------
+    logger : Logger
+        Logger som brukes for statusmeldinger under kjøringen.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+    """
     set_and_check_envs(source_name="UR")
 
     tables = load_config_tables(config_path="table_configs/tables_UR.yaml")

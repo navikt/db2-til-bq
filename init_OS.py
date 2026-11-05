@@ -21,6 +21,33 @@ def db2_to_bq(
     db2_conn: DB2Connector,
     logger: Logger,
 ):
+    """Les tabellen fra DB2 i datointervaller og skriv radene til BigQuery.
+
+    Kontrollerer først om måltabellen finnes, beregner startdato og sletter
+    eksisterende rader fra det første genererte datointervallet når tabellen
+    finnes. Henter deretter rader i månedsintervaller og laster dem i bolker.
+
+    Parameters
+    ----------
+    table : DimTable or FakTable
+        Tabellbeskrivelse som angir kilde, mål, datokolonne og sortering.
+    bq_client : BQConnector
+        Klient for kontroll, sletting og lasting i BigQuery.
+    db2_conn : DB2Connector
+        DB2-tilkobling som henter radbolker.
+    logger : Logger
+        Logger for statusmeldinger.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+
+    Raises
+    ------
+    ValueError
+        Hvis ``table.from_datetime`` ikke kan tolkes med forventet tidsformat.
+    """
     logger.info(
         f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}"
     )
@@ -77,6 +104,28 @@ def db2_to_bq(
 
 
 def main(logger: Logger, table_name: str = None):
+    """Velg faktatabeller og kjør DB2-til-BigQuery-jobben for dem.
+
+    Parameters
+    ----------
+    logger : Logger
+        Logger som brukes for statusmeldinger.
+    table_name : str, optional
+        Navn som sammenlignes med små bokstaver mot tabellnavnene. Verdien
+        konverteres ikke selv til små bokstaver.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+
+    Notes
+    -----
+    Slik funksjonene er definert, krever ``set_and_check_envs`` argumentet
+    ``source_name`` og ``load_config_tables`` argumentet ``config_path``.
+    Kallene her utelater begge argumentene. Derfor stopper standardkjøringen
+    med ``TypeError`` ved det første kallet, før tabeller behandles.
+    """
     set_and_check_envs()
 
     tables = load_config_tables()

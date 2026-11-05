@@ -12,6 +12,25 @@ from src.config_loader import TableModel
 
 
 def set_and_check_envs(source_name: str) -> None:
+    """Last inn og kontroller miljøvariablene for en datakilde.
+
+    Parameters
+    ----------
+    source_name : str
+        Navnet på datakilden som miljøvariablene gjelder for.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+
+    Raises
+    ------
+    EnvsNotSetError
+        Hvis en påkrevd miljøvariabel mangler.
+    Db2LicenseNotFoundError
+        Hvis lisensfilen mangler ved kjøring utenfor lokalt miljø.
+    """
     env_handler = EnvHandler(source_name=source_name)
     env_handler.load_envs()
     env_handler.check_envs()
@@ -20,6 +39,25 @@ def set_and_check_envs(source_name: str) -> None:
 def load_config_tables(
     config_path: str,
 ) -> list[Union[DimTable, FakTable]]:
+    """Les YAML-konfigurasjonen og bygg tabellobjekter.
+
+    Parameters
+    ----------
+    config_path : str
+        Filsti til YAML-filen med en ``tables``-liste.
+
+    Returns
+    -------
+    list of DimTable or FakTable
+        Tabellobjektene som er bygget fra konfigurasjonen.
+
+    Raises
+    ------
+    FileNotFoundError
+        Hvis konfigurasjonsfilen ikke finnes.
+    KeyError
+        Hvis YAML-innholdet mangler nøkkelen ``tables``.
+    """
     with open(config_path) as file:
         tables = safe_load(file)
 
@@ -33,6 +71,32 @@ def load_config_tables(
 def get_from_datetime(
     bq_client: BQConnector, table: Union[DimTable, FakTable], table_exists_in_bq: bool
 ) -> str:
+    """Finn starttidspunktet for innlasting og formater det som tekst.
+
+    Når tabellen finnes i BigQuery, brukes maksimumsverdien i tabellens
+    kontrollkolonne. Ellers brukes tidspunktet 730 dager før dagens dato.
+
+    Parameters
+    ----------
+    bq_client : BQConnector
+        Klient som utfører spørringen mot BigQuery.
+    table : DimTable or FakTable
+        Tabell med måltabell-ID og kontrollkolonne.
+    table_exists_in_bq : bool
+        Angir om måltabellen allerede finnes.
+
+    Returns
+    -------
+    str
+        Tidspunkt formatert som ``YYYY-MM-DD HH:MM:SS.ffffff``.
+
+    Raises
+    ------
+    IndexError
+        Hvis oppslaget mot en eksisterende tabell ikke gir noen rader.
+    AttributeError
+        Hvis maksimumsverdien er ``None`` og dermed ikke har ``strftime``.
+    """
     if table_exists_in_bq:
         max_query = f"SELECT MAX({table.check_col}) FROM {table.bq_table_id}"
         from_date_dict: dict[str, Any] = bq_client.get_rows(query=max_query)[0]
@@ -45,6 +109,19 @@ def get_from_datetime(
 
 
 def generate_limits(start_datetime: datetime) -> list[date]:
+    """Lag månedlige dato-grenser fra startmåneden til neste måned.
+
+    Parameters
+    ----------
+    start_datetime : datetime
+        Starttidspunkt; dagen ignoreres og erstattes med første dag i måneden.
+
+    Returns
+    -------
+    list of date
+        Første dag i hver måned, inkludert måneden som inneholder dagens dato
+        og den påfølgende måneden.
+    """
     start_date = start_datetime.date().replace(day=1)
     end_date = datetime.today().date() + relativedelta(months=1)
 
@@ -61,6 +138,22 @@ def generate_limits(start_datetime: datetime) -> list[date]:
 def delete_table(
     table: Union[DimTable, FakTable], bq_client: BQConnector, logger: Logger
 ) -> None:
+    """Slett tabellen fra BigQuery.
+
+    Parameters
+    ----------
+    table : DimTable or FakTable
+        Tabellobjekt som angir tabell-ID og datasett.
+    bq_client : BQConnector
+        Klient som utfører slettingen.
+    logger : Logger
+        Logger som brukes av klienten under slettingen.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+    """
     table_name = table.bq_table_id
     table_dataset = table.bq_dataset
     bq_client.delete_table(table_name=table_name, dataset=table_dataset, logger=logger)
@@ -69,6 +162,22 @@ def delete_table(
 def create_datasets(
     datasets: list[str], bq_connector: BQConnector, logger: Logger
 ) -> None:
+    """Opprett hvert datasett i listen gjennom BigQuery-klienten.
+
+    Parameters
+    ----------
+    datasets : list of str
+        Datasettnavn som skal opprettes.
+    bq_connector : BQConnector
+        Klient som oppretter datasettene.
+    logger : Logger
+        Logger som brukes av klienten.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+    """
     for dataset in datasets:
         bq_connector.create_dataset(dataset, logger=logger)
 
@@ -79,6 +188,28 @@ def db2_to_bq(
     db2_conn: DB2Connector,
     logger: Logger,
 ):
+    """Hent tabellrader fra DB2 i bolker og last dem til BigQuery.
+
+    For faktatabeller kontrolleres måltabellen og ``from_datetime`` beregnes
+    før SQL-spørringen bygges. For dimensjonstabeller utføres ikke denne
+    kontrollen her; SQL og bind-verdier hentes fra tabellobjektet.
+
+    Parameters
+    ----------
+    table : DimTable or FakTable
+        Tabellbeskrivelse som bygger DB2-spørring og BigQuery-konfigurasjon.
+    bq_client : BQConnector
+        Klient som kontrollerer måltabellen og laster radbolker.
+    db2_conn : DB2Connector
+        DB2-tilkobling som produserer radbolker.
+    logger : Logger
+        Logger for statusmeldinger.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+    """
     logger.info(
         f"Processing table: {table.name.upper()} of type:{table.table_type.value.upper()}"
     )
@@ -113,8 +244,27 @@ def db2_to_bq(
 
 
 def update_desc(logger: Logger, source_name: str):
-    """
-    Kjøres for å oppdatere tabell og kolonnekommentarer. #TODO få en jobb som kjører denne jevnlig
+    """Oppdater beskrivelser og skjema for tabellene i BigQuery.
+
+    Laster miljøvariabler og tabellkonfigurasjon, og sender beskrivelse og
+    kolonnedefinisjoner for hver tabell til BigQuery-klienten.
+
+    Parameters
+    ----------
+    logger : Logger
+        Logger for statusmeldinger og klientoperasjoner.
+    source_name : str
+        Navnet på datakilden som miljøvariablene gjelder for.
+
+    Returns
+    -------
+    None
+        Funksjonen returnerer ikke en verdi.
+
+    Notes
+    -----
+    Konfigurasjonsstien settes til ``{source_name}_tables.yaml`` relativt til
+    gjeldende arbeidskatalog.
     """
     set_and_check_envs(source_name=source_name)
 

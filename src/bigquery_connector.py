@@ -13,7 +13,23 @@ from src.exceptions import BigQueryErrors
 
 
 def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
+    """Serialiser datoobjekter for JSON.
+
+    Parameters
+    ----------
+    obj : Any
+        Objektet som skal serialiseres.
+
+    Returns
+    -------
+    str
+        Dato eller klokkeslett på ISO 8601-format.
+
+    Raises
+    ------
+    TypeError
+        Hvis ``obj`` ikke er en ``datetime``- eller ``date``-instans.
+    """
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
@@ -21,22 +37,47 @@ def json_serial(obj):
 
 
 class BQConnector:
+    """Kobler til BigQuery og utfører spørringer og tabelloperasjoner.
+
+    Attributes
+    ----------
+    client : google.cloud.bigquery.Client
+        BigQuery-klienten som brukes til API-kall.
+    """
+
     def __init__(self):
+        """Opprett en BigQuery-klient for denne tilkoblingen."""
         self.client: bigquery.Client = self._create_client()
 
     def _execute_query(self, query: str) -> bigquery.QueryJob:
-        """
-        Privat metode som brukes for å kjøre spørring mot BQ.
+        """Kjør en SQL-spørring mot BigQuery.
 
-        Args:
-            query (str): SQL spørring som skal kjøre
+        Parameters
+        ----------
+        query : str
+            SQL-spørringen som skal kjøres.
 
-        Returns (bigquery.QueryJob): En QueryJob som sendes videre for behandling.
-
+        Returns
+        -------
+        google.cloud.bigquery.QueryJob
+            Jobben som representerer spørringen.
         """
         return self.client.query(query=query)
 
     def query(self, query: str):
+        """Kjør en spørring og vent på at BigQuery-jobben blir ferdig.
+
+        Parameters
+        ----------
+        query : str
+            SQL-spørringen som skal kjøres.
+
+        Raises
+        ------
+        BigQueryMissingRequiredError, BigQueryInvalidValueError, BigQueryError
+            En klassifisert feil dersom jobben feiler med ``BadRequest``
+            og feilen er representert i jobbens feilliste.
+        """
         query_job = self._execute_query(query=query)
 
         try:
@@ -47,13 +88,17 @@ class BQConnector:
                 raise exception
 
     def get_rows(self, query: str) -> List[Dict[str, Any]]:
-        """
-        Metode for å kjøre spørring med resultater og som skal formaters som en liste av dicts.
-        Args:
-            query (str): SQL spørring som skal kjøres
+        """Kjør en spørring og returner radene som ordbøker.
 
-        Returns List[Dict[str, Any]: En liste av dicts med keys som kolonnenavn og values som verdi til kolonne.
+        Parameters
+        ----------
+        query : str
+            SQL-spørringen som skal kjøres.
 
+        Returns
+        -------
+        list of dict of str to Any
+            Rader med kolonnenavn som nøkler og kolonneverdier som verdier.
         """
         query_job = self._execute_query(query=query)
         return self._format_results(query_job=query_job)
@@ -61,6 +106,23 @@ class BQConnector:
     def put_rows(
         self, rows: list, table_id: str, job_config: bigquery.LoadJobConfig
     ) -> None:
+        """Last JSON-rader opp til en BigQuery-tabell og vent på jobben.
+
+        Parameters
+        ----------
+        rows : list
+            Radene som skal lastes opp.
+        table_id : str
+            Identifikatoren til måltabellen.
+        job_config : google.cloud.bigquery.LoadJobConfig
+            Konfigurasjon for lastejobben.
+
+        Raises
+        ------
+        BigQueryMissingRequiredError, BigQueryInvalidValueError, BigQueryError
+            En klassifisert feil dersom jobben feiler med ``BadRequest``
+            og feilen er representert i jobbens feilliste.
+        """
         job = self.client.load_table_from_json(
             json_rows=rows, destination=table_id, job_config=job_config
         )
@@ -78,11 +140,26 @@ class BQConnector:
         table_id: str,
         job_config: bigquery.LoadJobConfig,
     ):
-        """
-        Metode for å laste opp rader til BQ-tabell. Radene må være i en liste og som dicts. Vi bruker vår egen
-        json-serializer for å håndtere datetime-objekter. Radene blir gjort om til strenger, puttet i en bytes buffer og
-        lastet opp med load_table_from_file. load_table_from_json fungerte ikke som ønsket, ettersom datetime objekter
-        ikke ble håndtert som forventet.
+        """Last rader opp som linjedelt JSON med egen dato-serialisering.
+
+        Radene serialiseres én per linje til en bytes-buffer og lastes opp med
+        ``load_table_from_file``.
+
+        Parameters
+        ----------
+        rows : list of dict
+            Radene som skal serialiseres og lastes opp.
+        table_id : str
+            Identifikatoren til måltabellen.
+        job_config : google.cloud.bigquery.LoadJobConfig
+            Konfigurasjon for lastejobben; kildeformatet settes til linjedelt
+            JSON.
+
+        Raises
+        ------
+        BigQueryMissingRequiredError, BigQueryInvalidValueError, BigQueryError
+            En klassifisert feil dersom jobben feiler med ``BadRequest``
+            og feilen er representert i jobbens feilliste.
         """
         data_str = "\n".join(
             json.dumps(item, ensure_ascii=False, default=json_serial) for item in rows
@@ -107,28 +184,28 @@ class BQConnector:
 
     @staticmethod
     def _create_client() -> bigquery.Client:
-        """
-        Lager en bigquery klient. En av to envs må være satt
+        """Opprett en BigQuery-klient med klientbibliotekets standardoppsett.
 
-            - GOOGLE_CLOUD_PROJECT: prosjekt id som skal brukes for lokal utvikling
-
-            - GOOGLE_APPLICATION_CREDENTIALS: Sti til google credentials fil. Kan brukes til  utvikling
-                                              lokalt eller på NAIS.
-
-        Returns (bigquery.Client): Oppretter bigquery klient
-
+        Returns
+        -------
+        google.cloud.bigquery.Client
+            Den opprettede BigQuery-klienten.
         """
         return bigquery.Client()
 
     @staticmethod
     def _format_results(query_job: bigquery.QueryJob) -> List[Dict[str, Any]]:
-        """
-        Statisk metode for å formatere resultater fra en QueryJob.
-        Args:
-            query_job (bigquery.QueryJob): QueryJob med resultater fra en spørring
+        """Formater resultatene fra en BigQuery-jobb som ordbøker.
 
-        Returns:
+        Parameters
+        ----------
+        query_job : google.cloud.bigquery.QueryJob
+            Jobben med spørringsresultatene.
 
+        Returns
+        -------
+        list of dict of str to Any
+            Resultatrader med kolonnenavn som nøkler.
         """
         results = query_job.result()
         return [{key: value for key, value in row.items()} for row in results]
@@ -140,6 +217,19 @@ class BQConnector:
         description: str = None,
         location: str = "europe-north1",
     ) -> None:
+        """Opprett et datasett med valgfri beskrivelse og plassering.
+
+        Parameters
+        ----------
+        dataset_name : str
+            Navnet eller referansen til datasettet.
+        logger : Logger
+            Logger som får melding før opprettelsen.
+        description : str, optional
+            Beskrivelse som settes dersom verdien er sann.
+        location : str, default "europe-north1"
+            Plasseringen som settes på datasettet.
+        """
 
         dataset = bigquery.Dataset(dataset_ref=dataset_name)
         dataset.location = location
@@ -153,13 +243,35 @@ class BQConnector:
         self.client.create_dataset(dataset)
 
     def delete_table(self, table_name: str, dataset: str, logger: Logger) -> None:
+        """Slett en tabell i det aktive BigQuery-prosjektet.
+
+        Parameters
+        ----------
+        table_name : str
+            Navnet på tabellen som skal slettes.
+        dataset : str
+            Datasettet tabellen tilhører.
+        logger : Logger
+            Logger som får melding før slettingen.
+        """
         project_id = self.client.project
         table_id = f"{project_id}.{dataset}.{table_name}"
         logger.info(f"Deleting table {table_id} in {dataset} in {project_id}")
         self.client.delete_table(table_id)
 
     def check_if_table_exists_in_bq(self, table_id: str) -> bool:
-        # Check if table exists in BQ, and set appropriate load method.
+        """Sjekk om en BigQuery-tabell finnes.
+
+        Parameters
+        ----------
+        table_id : str
+            Tabellens identifikator.
+
+        Returns
+        -------
+        bool
+            ``True`` hvis tabellen finnes, ellers ``False``.
+        """
         try:
             self.client.get_table(table_id)  # Make an API request.
             table_exists_in_bq = True
@@ -170,6 +282,19 @@ class BQConnector:
     def update_table_and_col_descriptions(
         self, table_id: str, desc: str, schema: List, logger: Logger
     ):
+        """Oppdater tabellbeskrivelse og skjema når verdiene er endret.
+
+        Parameters
+        ----------
+        table_id : str
+            Tabellens identifikator.
+        desc : str
+            Ny tabellbeskrivelse.
+        schema : list
+            Nytt tabellskjema.
+        logger : Logger
+            Logger som får meldinger om kontroll og eventuell oppdatering.
+        """
         logger.info(f"Sjekker tabell {table_id} for oppdateringer")
 
         bq_table = self.client.get_table(table_id)
