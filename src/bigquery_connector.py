@@ -15,6 +15,9 @@ from src.exceptions import BigQueryErrors
 def json_serial(obj):
     """Serialiser datoobjekter for JSON.
 
+    Funksjonen brukes for å serialisere date eller datetime objekter som strenger, siden JSON formatet ikke støtter
+    python date eller datetime objekter. Date eller datetime objekter oppstår som resultater fra DB2 spørringer
+
     Parameters
     ----------
     obj : Any
@@ -108,6 +111,8 @@ class BQConnector:
     ) -> None:
         """Last JSON-rader opp til en BigQuery-tabell og vent på jobben.
 
+        Brukes ikke. TODO: Skal fjernes
+
         Parameters
         ----------
         rows : list
@@ -140,10 +145,13 @@ class BQConnector:
         table_id: str,
         job_config: bigquery.LoadJobConfig,
     ):
-        """Last rader opp som linjedelt JSON med egen dato-serialisering.
+        """Last rader opp som Newline delimited  JSON med egen dato-serialisering.
 
         Radene serialiseres én per linje til en bytes-buffer og lastes opp med
         ``load_table_from_file``.
+
+        put_rows_alt heter put_rows_alt siden put_rows allerede eksisterte:
+        TODO: endre navn til put_rows når put_rows funksjonen er fjernet.
 
         Parameters
         ----------
@@ -195,8 +203,9 @@ class BQConnector:
 
     @staticmethod
     def _format_results(query_job: bigquery.QueryJob) -> List[Dict[str, Any]]:
-        """Formater resultatene fra en BigQuery-jobb som ordbøker.
+        """Formaterer resultatene fra en BigQuery-jobb som dicts.
 
+        query_job.results() retunerer en iterator, vi ønsker resultatene i en liste.
         Parameters
         ----------
         query_job : google.cloud.bigquery.QueryJob
