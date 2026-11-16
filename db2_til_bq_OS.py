@@ -6,17 +6,14 @@ from src.logger import Logger
 
 
 def main(logger: Logger):
-    """Kjør den konfigurerte DB2-til-BigQuery-jobben for OS.
+    """
+    Hent data fra Oppdragssystemet (OS) og legg i BQ.
 
     Parameters
     ----------
     logger : Logger
-        Logger som brukes for statusmeldinger under kjøringen.
+        Logger for statusmeldinger.
 
-    Returns
-    -------
-    None
-        Funksjonen returnerer ikke en verdi.
     """
     set_and_check_envs(source_name="OS")
 
