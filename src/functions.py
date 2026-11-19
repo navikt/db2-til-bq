@@ -17,19 +17,18 @@ def set_and_check_envs(source_name: str) -> None:
     Parameters
     ----------
     source_name : str
-        Navnet på datakilden som miljøvariablene gjelder for.
+        Navnet på datakilden (enten "OS" eller "UR").
 
     Returns
     -------
     None
-        Funksjonen returnerer ikke en verdi.
 
     Raises
     ------
     EnvsNotSetError
         Hvis en påkrevd miljøvariabel mangler.
     Db2LicenseNotFoundError
-        Hvis lisensfilen mangler ved kjøring utenfor lokalt miljø.
+        Hvis lisensfilen for DB2 mangler ikke er funnet.
     """
     env_handler = EnvHandler(source_name=source_name)
     env_handler.load_envs()
