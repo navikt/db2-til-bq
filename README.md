@@ -17,6 +17,8 @@ Det er avhengighetene i `requirements.txt` som blir brukt i dockerimaget, og som
 
 (Var vanskelig å bruke `pyproject.toml` for docker og dependabot, men vi ønsker likevel å bruke uv.)
 
+Dockerimagene trenger også systembibliotekene til IBM DB2-driveren. Pakken `libxml2-2.13-2` gir `libxml2.so.2`; denne kopieres sammen med `liblzma` og `libz` fra byggesteget til runtime-imaget. En import av `ibm_db` i runtime-steget stopper byggingen hvis nødvendige biblioteker mangler.
+
 ### GCP login
 Lokalt brukes OAuth:
 
