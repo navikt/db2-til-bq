@@ -4,7 +4,7 @@ WORKDIR /app
 
 USER root
 # Install system dependencies in builder stage
-RUN apk add --no-cache linux-pam
+RUN apk add --no-cache linux-pam libxml2-2.13-2
 USER nonroot
 
 RUN python3 -m venv venv
@@ -20,6 +20,7 @@ FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/python:3.15
 
 # Copy system libraries required by ibm_db from builder
 COPY --from=builder /lib/libpam.* /lib/libcrypt.* /lib/
+COPY --from=builder /usr/lib/libxml2.so.2* /usr/lib/liblzma.so.5* /usr/lib/libz.so.1* /usr/lib/
 
 # 1069 is enforced user and group ID used by the Nais platform
 COPY --chown=1069:1069 --from=builder /app /app
@@ -28,6 +29,8 @@ ENV PATH=/app/venv/bin:$PATH
 ENV PYTHONPATH=/app
 
 WORKDIR /app
+
+RUN ["/app/venv/bin/python", "-c", "import ibm_db"]
 
 COPY ../db2_til_bq_OS.py .
 COPY ../src ./src
