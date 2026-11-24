@@ -29,9 +29,25 @@ def db2_to_bq(
         table_id=table.bq_table_id
     )
     logger.info(f"{table.name.upper()} exists: {table_exists_in_bq}")
-    table.from_datetime = get_from_datetime(
-        bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq
-    )
+    if not table_exists_in_bq and table.load_all_history:
+        rows = db2_conn.get_rows(
+            query=(
+                f"SELECT MIN({table.check_col}) AS START_DATETIME "
+                f"FROM {table.db2_schema}.{table.name}"
+            ),
+            binds={},
+        )
+        first_datetime = rows[0]["START_DATETIME"]
+        if first_datetime is None:
+            logger.info(
+                f"No rows with a non-null {table.check_col} in {table.name}; skipping load"
+            )
+            return
+        table.from_datetime = first_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")
+    else:
+        table.from_datetime = get_from_datetime(
+            bq_client=bq_client, table=table, table_exists_in_bq=table_exists_in_bq
+        )
     start_datetime = datetime.strptime(table.from_datetime, "%Y-%m-%d %H:%M:%S.%f")
 
     dates = generate_limits(start_datetime=start_datetime)

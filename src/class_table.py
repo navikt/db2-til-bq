@@ -120,13 +120,21 @@ class FakTable(BaseTable):
         cols: list[SchemaField],
         check_col: str,
         order_cols: list[str],
+        partition_expiration_days: int | None,
+        load_all_history: bool = False,
     ) -> None:
         super().__init__(
             name=name, description=description, cols=cols, table_type=TableType.FAK
         )
         self._check_col = check_col
         self._order_cols = order_cols
+        self._partition_expiration_days = partition_expiration_days
+        self._load_all_history = load_all_history
         self._from_datetime = None
+
+    @property
+    def load_all_history(self) -> bool:
+        return self._load_all_history
 
     @property
     def check_col(self) -> str:
@@ -158,7 +166,13 @@ class FakTable(BaseTable):
         _field: str = self.check_col
 
         partition = table.TimePartitioning(
-            type_="DAY", field=_field, expiration_ms=1000 * 60 * 60 * 24 * 730
+            type_="DAY",
+            field=_field,
+            expiration_ms=(
+                self._partition_expiration_days * 24 * 60 * 60 * 1000
+                if self._partition_expiration_days is not None
+                else None
+            ),
         )
 
         base_job_config.time_partitioning = partition

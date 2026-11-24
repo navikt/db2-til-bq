@@ -109,6 +109,8 @@ class TableModel(BaseModel):
     cols: list[ColumnModel]
     check_col: Optional[str] = None
     order_cols: Optional[list[str]] = None
+    partition_expiration_days: int | None = Field(default=730, gt=0, strict=True)
+    load_all_history: bool = Field(default=False, strict=True)
 
     def to_table_object(self) -> Union[DimTable, FakTable]:
         cols = [col.to_bq_schema_field() for col in self.cols]
@@ -126,6 +128,8 @@ class TableModel(BaseModel):
                 cols=cols,
                 check_col=self.check_col,
                 order_cols=self.order_cols,
+                partition_expiration_days=self.partition_expiration_days,
+                load_all_history=self.load_all_history,
             )
 
     @staticmethod
@@ -136,6 +140,8 @@ class TableModel(BaseModel):
         cols = [ColumnModel.from_dict(col) for col in table_dict.get("cols")]
         check_col = table_dict.get("check_col")
         order_cols = table_dict.get("order_cols")
+        partition_expiration_days = table_dict.get("partition_expiration_days", 730)
+        load_all_history = table_dict.get("load_all_history", False)
 
         return TableModel(
             name=name,
@@ -144,6 +150,8 @@ class TableModel(BaseModel):
             cols=cols,
             check_col=check_col,
             order_cols=order_cols,
+            partition_expiration_days=partition_expiration_days,
+            load_all_history=load_all_history,
         )
 
     @field_validator("table_type")
