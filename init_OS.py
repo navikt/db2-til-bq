@@ -77,9 +77,9 @@ def db2_to_bq(
 
 
 def main(logger: Logger, table_name: str = None):
-    set_and_check_envs()
+    set_and_check_envs(source_name="OS")
 
-    tables = load_config_tables()
+    tables = load_config_tables(config_path="table_configs/tables_OS.yaml")
     bq_client = BQConnector()
 
     tables_to_run = [
@@ -100,4 +100,4 @@ def main(logger: Logger, table_name: str = None):
 
 if __name__ == "__main__":
     logs = Logger(name="db2-til-bq-init-OS")
-    main(logger=logs, table_name="t_vent_stoppnivaa")
+    main(logger=logs, table_name="t_oppdrag_kilde")
