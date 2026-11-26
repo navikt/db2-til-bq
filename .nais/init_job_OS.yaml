@@ -17,7 +17,7 @@ spec:
   webproxy: true
   filesFrom:
     - secret: service-account-key
-    - secret: db2-license-11
+    - secret: db2-license-12
       mountPath: /var/run/secrets/db2-license
   envFrom:
     - secret: oppdrag-credentials
