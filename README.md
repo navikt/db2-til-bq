@@ -29,11 +29,11 @@ I nais-jobben har vi en egen servicebruker, `nais-job-srv`. Den har en egen nøk
 #### Oppdatere tabeller i bigquery
 I filen `src/config_tables.py` ligger listen med tabeller og medfølgende beskrivelser og schema for kolonnene. Når man oppdaterer disse må man også manuelt kjøre `update_desc()` i `main.py`. Dersom man endrer `mode` eller `max_length` på en kolonne, må man huske å slette tabellen først.
 
-### Partisjonsutløp
+### Partition expiration
 
-FAK-tabeller har som standard 730 dagers partisjonsutløp. Sett
+FAK-tabeller har som standard 730 dagers `partition expiration`, som er en setting i BigQuery hvor eldre data blir rullerende slettet hver dag. Sett
 `partition_expiration_days` i tabellens YAML-konfigurasjon til et positivt heltall
-for et annet antall dager, eller `null` for ingen partisjonsutløp.
+for et annet antall dager, eller `null` for ingen `partition expiration`.
 `t_oppdrag_kilde` er konfigurert med `null` fordi vi trenger hele historikken.
 
 Ved kjøring av `init_OS.py` styrer `load_all_history: true` at en ny tabell
