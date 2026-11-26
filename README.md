@@ -29,6 +29,20 @@ I nais-jobben har vi en egen servicebruker, `nais-job-srv`. Den har en egen nøk
 #### Oppdatere tabeller i bigquery
 I filen `src/config_tables.py` ligger listen med tabeller og medfølgende beskrivelser og schema for kolonnene. Når man oppdaterer disse må man også manuelt kjøre `update_desc()` i `main.py`. Dersom man endrer `mode` eller `max_length` på en kolonne, må man huske å slette tabellen først.
 
+### Partition expiration
+
+FAK-tabeller har som standard 730 dagers `partition expiration`, som er en setting i BigQuery hvor eldre data blir rullerende slettet hver dag. Sett
+`partition_expiration_days` i tabellens YAML-konfigurasjon til et positivt heltall
+for et annet antall dager, eller `null` for ingen `partition expiration`.
+`t_oppdrag_kilde` er konfigurert med `null` fordi vi trenger hele historikken.
+
+Ved kjøring av `init_OS.py` styrer `load_all_history: true` at en ny tabell
+lastes fra den tidligste verdien av `check_col` i DB2, måned for måned.
+Dette er aktivert for `t_oppdrag_kilde`. Andre nye tabeller starter som før
+730 dager tilbake. Eksisterende tabeller fortsetter fra siste lastede tidspunkt;
+innstillingen fyller ikke inn manglende eldre historikk i eksisterende tabeller.
+Partisjonsutløp og tabellutløp i BigQuery må også tillate at historikken beholdes.
+
 ### db2 login
 
 Trenger en `.env` fil lokalt (filnavn lagt i `.gitignore`), som inneholder følgende (på følgende format, uten noen fnutter):

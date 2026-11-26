@@ -206,6 +206,8 @@ tables:
 
 - name: t_oppdrag_kilde
   table_type: fak
+  partition_expiration_days: null
+  load_all_history: true
   description: Kobling mellom oppdrag og kildesystem i Oppdragssystemet
   check_col: tidspkt_reg
   order_cols: 
