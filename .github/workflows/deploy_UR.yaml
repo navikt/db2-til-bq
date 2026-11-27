@@ -36,13 +36,13 @@ jobs:
                   team: utsikt
                   dockerfile: dockerfiles/Dockerfile_UR
             - name: Deploy to PROD
-              uses: nais/deploy/actions/deploy@7b60caaded00332e9aa117a8342daa0876851dfe # v2
+              uses: nais/deploy/actions/deploy@6fe576e10c7a325643bad96566bd6cb180a2f782 # v2
               env:
                   CLUSTER: "prod-fss"
                   RESOURCE: .nais/job_UR.yaml
                   WORKLOAD_IMAGE: ${{ steps.docker-build-push.outputs.image }}
             - name: Deploy to DEV
-              uses: nais/deploy/actions/deploy@7b60caaded00332e9aa117a8342daa0876851dfe # v2
+              uses: nais/deploy/actions/deploy@6fe576e10c7a325643bad96566bd6cb180a2f782 # v2
               env:
                   CLUSTER: "dev-fss"
                   RESOURCE: .nais/job_UR.yaml # same list as in changed-files step above
